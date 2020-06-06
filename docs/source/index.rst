@@ -35,7 +35,7 @@ For using this package, use the import command::
 
     from daeg1 import *
 
-The use of this package on the main unweighted walks models can be seeing in the `main webpage <https://anjimene.gitlabpages.inria.fr/da-equations-genus-1>`_.
+The use of this package on the main unweighted walks models can be seeing in the `main webpage <https://discretewalks.gitlabpages.inria.fr/daeg1>`_.
 
 This code is under the terms of GNU General Public License version 3.
 
@@ -60,4 +60,4 @@ Indices and Tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-* `Results web <https://anjimene.gitlabpages.inria.fr/da-equations-genus-1>`_
+* `Results web <https://discretewalks.gitlabpages.inria.fr/daeg1>`_
