@@ -2102,7 +2102,7 @@ class WalkModel():
         return self.__reductions[key]
 
     @dLogFunction
-    def telescope(self, func, model="P"):
+    def telescoping(self, func, model="P"):
         r'''
             Method to compute a telescoper (of possible) of a rational function over the kernel curve.
 
@@ -2131,28 +2131,28 @@ class WalkModel():
         '''
         model = self.model(model)
         key = (func.numerator(), func.denominator(), model)
-        dlogging.info("WalkModel:telescope: computing the telescoper for %s" %func)
+        dlogging.info("WalkModel:telescoping: computing the telescoper for %s" %func)
 
         if(not key in self.__telescoper):
             curve = self.curve(model)
 
-            dlogging.log(25, "WalkModel:telescope: computing the poles of the rational function...")
+            dlogging.log(25, "WalkModel:telescoping: computing the poles of the rational function...")
             poles = self.poles(func)
 
-            dlogging.log(25, "WalkModel:telescope: computing the tau-orbits of the poles...")
+            dlogging.log(25, "WalkModel:telescoping: computing the tau-orbits of the poles...")
             orbits, jumps = self.orbits(poles)
 
             if(any(len(orbit) == 1 for orbit in orbits)):
                 raise ValueError("No telescoper: one orbit with pole has a unique point --> opol can not be zero")
 
-            dlogging.log(25, "WalkModel:telescope: computing the reduction for the rational function...")
+            dlogging.log(25, "WalkModel:telescoping: computing the reduction for the rational function...")
             res, orbit_sum, h = self.reduction(func, orbits, jumps, model)
             for i in range(len(orbit_sum[0])):
                 if(orbit_sum[1][i] != 0):
                     raise ValueError("No telescoper: opol different of zero.\n\t- Function: %s\n\t- Point: %s\n\t- opol: %s" %(func, orbit_sum[0][i], orbit_sum[1][i]))
 
             # opol(f) = 0 for all poles
-            dlogging.log(25, "WalkModel:telescope: the orbit polar parts are zero. Analyzing the residual part\n\t- Res(f): %s" %res)
+            dlogging.log(25, "WalkModel:telescoping: the orbit polar parts are zero. Analyzing the residual part\n\t- Res(f): %s" %res)
             rows = [[expand_at_point(curve, res, pole, 0)[0].get(-1, 0) for pole in poles]]
             M = Matrix(rows)
             nullspace = M.left_kernel()
@@ -2161,20 +2161,20 @@ class WalkModel():
 
             while(nullspace.rank() == 0):
                 total += 1
-                dlogging.log(22, "WalkModel:telescope: telescoper not found. Computing the derivative %d..." %total)
+                dlogging.log(22, "WalkModel:telescoping: telescoper not found. Computing the derivative %d..." %total)
                 func = self.derivative(func, model) # computing delta(f)
-                dlogging.log(22, "WalkModel: telescope: computing the reduction...")
+                dlogging.log(22, "WalkModel:telescoping: computing the reduction...")
                 cres, orbit_sum, h = self.reduction(func, orbits, jumps, model)
                 for i in range(len(orbit_sum[0])):
                     if(orbit_sum[1][i] != 0):
                         raise ValueError("No telescoper: opol different of zero.\n\t- N.derivatives: %d\n\t- Point: %s\n\t- opol: %s" %(total, orbit_sum[0][i], orbit_sum[1][i]))
                 g = simplify_rational_variety(g+h,curve)
-                dlogging.log(25, "WalkModel:telescope: computing the residual contribution...")
+                dlogging.log(25, "WalkModel:telescoping: computing the residual contribution...")
                 rows += [[expand_at_point(curve, cres, pole, 0)[0].get(-1, 0) for pole in poles]]
                 M = Matrix(rows)
                 nullspace = M.left_kernel()
 
-            dlogging.log(25, "WalkModel:telescope: telescoper found\n\t- Telescoper: %s\n\t- Certificate: %s" %(str(nullspace.matrix()[0]), g))
+            dlogging.log(25, "WalkModel:telescoping: telescoper found\n\t- Telescoper: %s\n\t- Certificate: %s" %(str(nullspace.matrix()[0]), g))
             self.__telescoper[key] = (nullspace.matrix()[0], g)
 
         return self.__telescoper[key]

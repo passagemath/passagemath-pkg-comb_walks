@@ -431,7 +431,7 @@ def get_telescoper(m, log_level=ERROR):
 
         b2 = m.b('y')(x=x0/x1, y=y0/y1)
 
-        return m.telescope(b2)
+        return m.telescoping(b2)
     except ValueError as e:
         dlogging.warning("Model %s has an error with the telescoper:\n%s" %(m.name(), e))
         return ("No telescoper", None)
