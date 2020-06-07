@@ -513,8 +513,8 @@ class WalkModel():
 
             All the models in the list have only one parameter::
 
-                sage: from daeg1.walkmodel import all_models
-                sage: all(m.pars() == other.pars() for other in all_models)
+                sage: from daeg1.walkmodel import AllModels
+                sage: all(m.pars() == other.pars() for other in AllModels)
                 True
         '''
         parameters = self.base_ring().gens()
@@ -820,7 +820,7 @@ class WalkModel():
 
             For all the examples considered in the papers of MBB and DHRS, they are of short steps::
 
-                sage: all(m.is_short_walk() for m in all_models)
+                sage: all(m.is_short_walk() for m in AllModels)
                 True
         '''
         return max(max(abs(step[i]) for step in self.__steps) for i in range(2)) == 1
@@ -849,7 +849,7 @@ class WalkModel():
             For short walks, singular models are precisely those models which kernel equation
             generates a singular (i.e., non-elliptic) curve::
 
-                sage: all(m in NonEllipticC for m in all_models if m.is_singular())
+                sage: all(m in NonEllipticC for m in AllModels if m.is_singular())
                 True
 
         '''
@@ -876,7 +876,7 @@ class WalkModel():
 
             All the models considered in the papers by BMM and DHRS are not weighted::
 
-                sage: all(not m.is_weighted() for m in all_models)
+                sage: all(not m.is_weighted() for m in AllModels)
                 True
 
         '''
@@ -977,9 +977,9 @@ class WalkModel():
 
             For all the models in the papers of BMM and DHRS, we can check the identity with the definition::
 
-                sage: all(m.kernel("A") == (x*y*(1-t*m.step()))(x=x/z, y=y/z).numerator() for m in all_models) # long time
+                sage: all(m.kernel("A") == (x*y*(1-t*m.step()))(x=x/z, y=y/z).numerator() for m in AllModels) # long time
                 True
-                sage: all(m.kernel("P") == (x*y*(1-t*m.step()))(x=x0/x1, y=y0/y1).numerator() for m in all_models) # long time
+                sage: all(m.kernel("P") == (x*y*(1-t*m.step()))(x=x0/x1, y=y0/y1).numerator() for m in AllModels) # long time
                 True
 
             The Weierstras model can not be computed for some models since they are not elliptic::
@@ -1602,9 +1602,9 @@ class WalkModel():
             OUTPUT::
 
                 sage: from daeg1 import *
-                sage: all(m.b(2)(x=x0/x1,y=y0/y1,z=1) == m.KR_f(2,'p') for m in all_models if (not m.is_singular())) # long time
+                sage: all(m.b(2)(x=x0/x1,y=y0/y1,z=1) == m.KR_f(2,'p') for m in AllModels if (not m.is_singular())) # long time
                 True
-                sage: all(m.b(1)(x=x0/x1,y=y0/y1) == pullback(m.iota(1,'p'))(m.KR_f(1, 'p')) for m in all_models if (not m.is_singular())) # long time
+                sage: all(m.b(1)(x=x0/x1,y=y0/y1) == pullback(m.iota(1,'p'))(m.KR_f(1, 'p')) for m in AllModels if (not m.is_singular())) # long time
                 True
         '''
         model = self.model(model)
@@ -2405,17 +2405,17 @@ class WalkModel():
                 sage: dic_models["FG-BMM-3.2"].order_tau(2)
                 Infinity
 
-            For the models in ``all_models`` we can check all the orders of `\tau`::
+            For the models in ``AllModels`` we can check all the orders of `\tau`::
 
-                sage: all(m.order_tau() == 2 for m in all_models if m.name().startswith("FG-BMM-1.")) # long time
+                sage: all(m.order_tau() == 2 for m in AllModels if m.name().startswith("FG-BMM-1.")) # long time
                 True
-                sage: all(m.order_tau() == 3 for m in all_models if m.name().startswith("FG-BMM-2.")) # long time
+                sage: all(m.order_tau() == 3 for m in AllModels if m.name().startswith("FG-BMM-2.")) # long time
                 True
                 sage: dic_models["FG-BMM-3.1"].order_tau()
                 4
                 sage: dic_models["FG-BMM-3.2"].order_tau()
                 4
-                sage: all(m.order_tau() == Infinity for m in all_models if not m.name().startswith("FG")) # long time
+                sage: all(m.order_tau() == Infinity for m in AllModels if not m.name().startswith("FG")) # long time
                 True
 
         '''
@@ -2620,7 +2620,7 @@ class WalkModel():
 
             This method always returns the multiplicative inverse of the method :func:`dy_dx`::
 
-                sage: all(1/m.dx_dy() == m.dy_dx() for m in all_models)
+                sage: all(1/m.dx_dy() == m.dy_dx() for m in AllModels)
                 True
         '''
         x,y,_ = self.vars("A")
@@ -3093,14 +3093,14 @@ class WalkModel():
                 sage: from daeg1 import *
                 sage: WalkModel.example_model().name()
                 Example Model
-                sage: all_models[0]
+                sage: AllModels[0]
                 FG-BMM-1.01
             
             It is important to remark that having different names does not imply that the models are different::
 
-                sage: all_models[0] == WalkModel.example_model()
+                sage: AllModels[0] == WalkModel.example_model()
                 True
-                sage: all_models[0].name() == WalkModel.example_model().name()
+                sage: AllModels[0].name() == WalkModel.example_model().name()
                 False
         '''
         if(self.__name is None): return ""
@@ -3226,11 +3226,11 @@ EllipticC = [
     WalkModel([NE,S,SW,W],name="wIII")
 ]
 
-all_models = FiniteGroup + NonEllipticC + EllipticC
+AllModels = FiniteGroup + NonEllipticC + EllipticC
 
-dic_DHRS = {m.name() : m for m in all_models if m in EllipticC}
+dic_DHRS = {m.name() : m for m in AllModels if m in EllipticC}
 dic_DA = {m.name() : m for m in EllipticC if m in DAModels}
-dic_models = {m.name() : m for m in all_models}
+dic_models = {m.name() : m for m in AllModels}
 
 t = WalkModel.example_model().pars()
 x,y,z = WalkModel.example_model().vars("A")

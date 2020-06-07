@@ -317,7 +317,7 @@ def order_morphism(morphism, bound=10):
         that have finite order, and also some that have infinite order::
 
             sage: from daeg1.walkmodel import *
-            sage: for m in all_models: # long time (> 15 seconds)
+            sage: for m in AllModels: # long time (> 15 seconds)
             ....:     if(order_morphism(m.iota(1,'p')) != 2):
             ....:         print("Error in the order of x-involution on the model %s" %m.name())
             ....:     if(order_morphism(m.iota(2,'p')) != 2):
