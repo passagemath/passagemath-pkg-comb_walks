@@ -658,7 +658,7 @@ class WalkModel():
             Using Lemma 4.1.1 from Fayolle's book, we have that the order of `\tau` is `2` if 
             and only if the determinant of this matrix is exactly zero::
 
-                sage: all(dic_models["FG-BMM-1.%02d" %i].weight_matrix().determinant() == 0 for i in range(1,11))
+                sage: all(ModelDict["FG-BMM-1.%02d" %i].weight_matrix().determinant() == 0 for i in range(1,11))
                 True
         '''
         if(not self.is_short_walk()):
@@ -694,7 +694,7 @@ class WalkModel():
             EXAMPLE::
 
                 sage: from daeg1 import *
-                sage: m = dic_models["FG-BMM-1.02"]
+                sage: m = ModelDict["FG-BMM-1.02"]
                 sage: m.weight_minor_matrix()
                 [ 0 -4  0  0]
                 [ 4  0  0  0]
@@ -705,7 +705,7 @@ class WalkModel():
 
             The determinant of this matrix indicates if the map `\tau` has order 3::
 
-                sage: sage: all(dic_models["FG-BMM-2.%d" %i].weight_minor_matrix().determinant() == 0 for i in range(1,6))
+                sage: sage: all(ModelDict["FG-BMM-2.%d" %i].weight_minor_matrix().determinant() == 0 for i in range(1,6))
         '''
 
         M = self.weight_matrix()
@@ -1097,14 +1097,14 @@ class WalkModel():
 
             Not always the neutral point is the origin in the XY models::
 
-                sage: m = dic_models["FG-BMM-2.5"]; m.neutral_point()
+                sage: m = ModelDict["FG-BMM-2.5"]; m.neutral_point()
                 (0 : -1 : 1)
-                sage: m = dic_models["wIB.1"]; m.neutral_point()
+                sage: m = ModelDict["wIB.1"]; m.neutral_point()
                 (-1 : 0 : 1)
 
             Sometimes, this neutral point can also be an algebraic element over t::
 
-                sage: m = dic_models["FG-BMM-1.02"]; m.neutral_point('P')
+                sage: m = ModelDict["FG-BMM-1.02"]; m.neutral_point('P')
                 verbose 0 ...
                 (0 : 1 , -1/2*r : 1)
         '''
@@ -2400,9 +2400,9 @@ class WalkModel():
 
             The bound argument put a limit on where we look for the order::
 
-                sage: dic_models["FG-BMM-3.2"].order_tau()
+                sage: ModelDict["FG-BMM-3.2"].order_tau()
                 4
-                sage: dic_models["FG-BMM-3.2"].order_tau(2)
+                sage: ModelDict["FG-BMM-3.2"].order_tau(2)
                 Infinity
 
             For the models in ``AllModels`` we can check all the orders of `\tau`::
@@ -2411,9 +2411,9 @@ class WalkModel():
                 True
                 sage: all(m.order_tau() == 3 for m in AllModels if m.name().startswith("FG-BMM-2.")) # long time
                 True
-                sage: dic_models["FG-BMM-3.1"].order_tau()
+                sage: ModelDict["FG-BMM-3.1"].order_tau()
                 4
-                sage: dic_models["FG-BMM-3.2"].order_tau()
+                sage: ModelDict["FG-BMM-3.2"].order_tau()
                 4
                 sage: all(m.order_tau() == Infinity for m in AllModels if not m.name().startswith("FG")) # long time
                 True
@@ -3230,7 +3230,7 @@ AllModels = FiniteGroup + NonEllipticC + EllipticC
 
 dic_DHRS = {m.name() : m for m in AllModels if m in EllipticC}
 dic_DA = {m.name() : m for m in EllipticC if m in DAModels}
-dic_models = {m.name() : m for m in AllModels}
+ModelDict = {m.name() : m for m in AllModels}
 
 t = WalkModel.example_model().pars()
 x,y,z = WalkModel.example_model().vars("A")

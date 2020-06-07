@@ -24,8 +24,8 @@ r'''
 from sage.all import (latex, var, Infinity)
 
 from .alggeo import (is_prod_point, order_morphism, asymptotics, pullback)
-from .walkmodel import (FiniteGroup, NonEllipticC, EllipticC, all_models,
-    dic_models, WalkModel, x0,x1,y0,y1)
+from .walkmodel import (FiniteGroup, NonEllipticC, EllipticC, AllModels,
+    ModelDict, WalkModel, x0,x1,y0,y1)
 
 from logging import ERROR
 from . import dlogging
@@ -296,7 +296,7 @@ def compile_json_library(folder, file):
     with open(file, "w") as f:
         f.write("let data = ")
         all_data = []
-        for m in all_models:
+        for m in AllModels:
             try:
                 with open(folder + m.name() + ".json", "r") as model_file:
                     all_data += [json.load(model_file)]
@@ -427,7 +427,7 @@ def get_telescoper(m, log_level=ERROR):
         aux_logging = dlogging.getLogger().level; dlogging.getLogger().setLevel(int(log_level))
     try:
         if(not isinstance(m, WalkModel)):
-            m = dic_models[m]
+            m = ModelDict[m]
 
         b2 = m.b('y')(x=x0/x1, y=y0/y1)
 
