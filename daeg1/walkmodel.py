@@ -3228,8 +3228,8 @@ EllipticC = [
 
 AllModels = FiniteGroup + NonEllipticC + EllipticC
 
-dic_DHRS = {m.name() : m for m in AllModels if m in EllipticC}
-dic_DA = {m.name() : m for m in EllipticC if m in DAModels}
+DHRSDict = {m.name() : m for m in AllModels if m in EllipticC}
+DADict = {m.name() : m for m in EllipticC if m in DAModels}
 ModelDict = {m.name() : m for m in AllModels}
 
 t = WalkModel.example_model().pars()
