@@ -1,4 +1,3 @@
-
 # **Walk Models with elliptic kernel function** 
 
 `daeg1` is a Sage package for understanding and getting data for generating functions of Walks in the 
@@ -31,7 +30,7 @@ For further information, the user can compile its own version of the documentati
 
 For accessing the documentation, the user can also access the website
 
-   `https://discretewalks.gitlabpages.intia.fr/daeg1/docs/index.html`
+   <https://discretewalks.gitlabpages.intia.fr/daeg1/docs/>
 
 ## **3. Extra requirements**
 
