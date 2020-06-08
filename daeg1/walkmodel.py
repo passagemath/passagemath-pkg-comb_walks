@@ -107,14 +107,14 @@ class WalkModel():
 
             There are a total of three models available:
 
-            * The basic model, with coordinates `x`, `y`, `z`: 1, "xyz", "xy", "a", "A"
+            * The basic model, with coordinates `x`, `y`, `z`: 1, "xyz", "xy", "a", "A", "affine"
             * The Weierstrass model, with coordinates `u`, `v`, `w` (if the curve is elliptic): 2, "uvw", "uv", "w", "weierstrass", "W"
             * The doubly-projectivized model: when we projectivize `x` and `y` indepently: 3, "x0x1y0y1", "x0y0", "p", "projective", "P"
 
             EXAMPLES::
 
                 sage: from daeg1.walkmodel import *
-                sage: all(WalkModel.model(el) == "A" for el in [1,'xyz','xy','a','A'])
+                sage: all(WalkModel.model(el) == "A" for el in [1,'xyz','xy','a','A','affine'])
                 True
                 sage: all(WalkModel.model(el) == "W" for el in [2, 'uvw', 'uv', 'w', 'weierstrass', 'W'])
                 True
@@ -125,7 +125,7 @@ class WalkModel():
                 ...
                 ValueError: Model not recognized
         '''
-        if(model == 1 or model == 'xyz' or model == 'xy' or model == 'a' or model == 'A'):
+        if(model == 1 or model == 'xyz' or model == 'xy' or model == 'a' or model == 'A' or 'affine'):
             return "A"
         elif(model == 2 or model == 'uvw' or model == 'uv' or model == 'w' or model == 'weierstrass' or model == "W"):
             return "W"
