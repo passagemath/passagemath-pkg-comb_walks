@@ -1906,7 +1906,7 @@ def polar_part(variety, func, point, sequence=False):
 
 def expand_at_point(variety, func, point, bound):
     r'''
-        Method to expand a a rational function on a variety using a local parameter.
+        Method to expand a rational function on a variety using a local parameter.
 
         Given a projective variety `A` and a point `P \in A` where the variety
         is smooth, we can have a *local parameter* `t \in C(A)`, i.e., a function
