@@ -125,7 +125,7 @@ class WalkModel():
                 ...
                 ValueError: Model not recognized
         '''
-        if(model == 1 or model == 'xyz' or model == 'xy' or model == 'a' or model == 'A' or 'affine'):
+        if(model == 1 or model == 'xyz' or model == 'xy' or model == 'a' or model == 'A' or model == 'affine'):
             return "A"
         elif(model == 2 or model == 'uvw' or model == 'uv' or model == 'w' or model == 'weierstrass' or model == "W"):
             return "W"
