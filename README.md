@@ -30,7 +30,7 @@ For further information, the user can compile its own version of the documentati
 
 For accessing the documentation, the user can also access the website
 
-   <https://discretewalks.gitlabpages.intia.fr/comb_walks/docs/>
+   <https://discretewalks.gitlabpages.inria.fr/comb_walks/docs/>
 
 ## **3. Extra requirements**
 
