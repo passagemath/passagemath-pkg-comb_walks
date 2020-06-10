@@ -3,7 +3,7 @@
 Algebraic Geometry in Sage
 ==============================
 
-.. automodule:: daeg1.alggeo
+.. automodule:: comb_walks.alggeo
    :members:
    :undoc-members:
    :show-inheritance:

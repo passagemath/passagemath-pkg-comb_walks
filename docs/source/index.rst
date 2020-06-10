@@ -3,7 +3,7 @@ Walks Models in the Quarter Plane
 =================================
 
 This is a the documentation that can be found inside the code
-of the package ``daeg1``.
+of the package ``comb_walks``.
 
 This package offers a unified interface for working with generating functions
 and related object to Walks in the Quarter Plane. Assume we have a set
@@ -29,13 +29,13 @@ and ends at `(i,j)`. Consider then the generating function:
     Q_{\mathcal{S}}(x,y,t) = \sum_{i,j,k \geq 0} q_{i,j,k}^{\mathcal{S}} x^i y^j t^k \in \mathbb{Q}[x,y][[t]].
 
 This package will allows the user to extract information of `Q_{\mathcal{S}}` providing an easy interface to
-create Walk models (see class :class:`~daeg1.walkmodel.WalkModel`).
+create Walk models (see class :class:`~comb_walks.walkmodel.WalkModel`).
 
 For using this package, use the import command::
 
-    from daeg1 import *
+    from comb_walks import *
 
-The use of this package on the main unweighted walks models can be seeing in the `main webpage <https://discretewalks.gitlabpages.inria.fr/daeg1>`_.
+The use of this package on the main unweighted walks models can be seeing in the `main webpage <https://discretewalks.gitlabpages.inria.fr/comb_walks>`_.
 
 This code is under the terms of GNU General Public License version 3.
 
@@ -45,7 +45,7 @@ It was also supported in part by the ANR `DeRerumNatura <https://specfun.inria.f
 French Agence Nationale de la Recherche.
 
 
-DAEG1 
+comb_walks 
 ===========
 
 .. toctree::
@@ -60,4 +60,4 @@ Indices and Tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-* `Results web <https://discretewalks.gitlabpages.inria.fr/daeg1>`_
+* `Results web <https://discretewalks.gitlabpages.inria.fr/comb_walks>`_

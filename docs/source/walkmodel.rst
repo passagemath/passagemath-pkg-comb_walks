@@ -3,7 +3,7 @@
 Models of Walks in the Quarter Plane
 ====================================
 
-.. automodule:: daeg1.walkmodel
+.. automodule:: comb_walks.walkmodel
    :members:
    :undoc-members:
    :show-inheritance:
