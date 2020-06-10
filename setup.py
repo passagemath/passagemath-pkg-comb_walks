@@ -13,12 +13,12 @@ def readfile(filename):
 # For the tests
 class SageTest(TestCommand):
     def run_tests(self):
-        errno = os.system("sage -t --force-lib daeg1")
+        errno = os.system("sage -t --force-lib comb_walks")
         if errno != 0:
             sys.exit(1)
 
 setup(
-    name = "daeg1",
+    name = "comb_walks",
     version = readfile("VERSION").strip(), # the VERSION file is shared with the documentation
     description='A Sage package for Walks in the Quarter Plane',
     # long_description = readfile("README.txt"), # get the long description from the README
@@ -42,7 +42,7 @@ setup(
       'Programming Language :: Python :: 2.7',
     ], # classifiers list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
     keywords = "walks SageMath elliptic",
-    packages = ["daeg1"],
+    packages = ["comb_walks"],
     cmdclass = {'test': SageTest}, # adding a special setup command for tests
     setup_requires   = [],
     install_requires = ['deprecation','sphinx'],

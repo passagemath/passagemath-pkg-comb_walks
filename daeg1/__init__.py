@@ -1,5 +1,5 @@
 r"""
-    Package daeg1
+    Package comb_walks
 
     In this package the user may find the following subpackages:
         * ``algeo``: some generic methods about Algebric Geometry

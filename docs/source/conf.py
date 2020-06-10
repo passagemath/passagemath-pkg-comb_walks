@@ -15,8 +15,8 @@
 # General information about the project.
 project = u"Walks in the quarter plane"
 copyright = u'2019'
-package_name = 'daeg1'
-package_folder = "../../daeg1"
+package_name = 'comb_walks'
+package_folder = "../../comb_walks"
 authors = u"Antonio Jimenez-Pastor"
 
 import sys

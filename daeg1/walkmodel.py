@@ -113,7 +113,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import *
+                sage: from comb_walks.walkmodel import *
                 sage: all(WalkModel.model(el) == "A" for el in [1,'xyz','xy','a','A','affine'])
                 True
                 sage: all(WalkModel.model(el) == "W" for el in [2, 'uvw', 'uv', 'w', 'weierstrass', 'W'])
@@ -144,7 +144,7 @@ class WalkModel():
 
             EXAMPLE::
 
-                sage: from daeg1.walkmodel import WalkModel
+                sage: from comb_walks.walkmodel import WalkModel
                 sage: WalkModel.example_model()
                 Walk Model (Example Model)
                 sage: WalkModel.example_model().steps()
@@ -173,7 +173,7 @@ class WalkModel():
 
             EXAMPLE::
 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: WalkModel.random_model()
                 Walk Model with steps: ...)
                 sage: WalkModel.random_model(max_steps=4).nsteps() <= 4
@@ -324,7 +324,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import WalkModel; m = WalkModel.example_model()
+                sage: from comb_walks.walkmodel import WalkModel; m = WalkModel.example_model()
                 sage: t = m.pars(); F = m.base_ring()
                 sage: nF = FractionField(NumberField(QQ['i']('i^2+1'), 'i')[t])
                 sage: m.ring(1) # Basic ring
@@ -407,7 +407,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import WalkModel; m = WalkModel.example_model()
+                sage: from comb_walks.walkmodel import WalkModel; m = WalkModel.example_model()
                 sage: m.ambient(1)
                 Projective Space of dimension 2 over Fraction Field of Univariate Polynomial Ring in t over Rational Field
                 sage: m.ambient(2)
@@ -453,7 +453,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import WalkModel; m = WalkModel.example_model()
+                sage: from comb_walks.walkmodel import WalkModel; m = WalkModel.example_model()
                 sage: x,y,z = m.vars(1); u,v,w = m.vars(2); x0,x1,y0,y1 = m.vars(3); t = m.pars()
                 sage: all(m.ring(el) == m.base_ring()[x,y,z] for el in [1,'xyz','xy','a','A'])
                 True
@@ -488,7 +488,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import WalkModel; m = WalkModel.example_model()
+                sage: from comb_walks.walkmodel import WalkModel; m = WalkModel.example_model()
                 sage: all(str(m.vars(el)) == "(x, y, z)" for el in [1,'xyz','xy','a','A'])
                 True
                 sage: all(str(m.vars(el)) == "(u, v, w)" for el in [2, 'uvw', 'uv', 'w', 'weierstrass', 'W'])
@@ -507,13 +507,13 @@ class WalkModel():
 
             EXAMPLE:
 
-                sage: from daeg1.walkmodel import WalkModel; m = WalkModel.example_model()
+                sage: from comb_walks.walkmodel import WalkModel; m = WalkModel.example_model()
                 sage: m.pars()
                 t
 
             All the models in the list have only one parameter::
 
-                sage: from daeg1.walkmodel import AllModels
+                sage: from comb_walks.walkmodel import AllModels
                 sage: all(m.pars() == other.pars() for other in AllModels)
                 True
         '''
@@ -534,7 +534,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import *
+                sage: from comb_walks.walkmodel import *
                 sage: m = WalkModel(N,S,E)
                 sage: all(m.random_step() in (N,S,E) for i in range(10))
                 True
@@ -637,7 +637,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: m = RookModel; m.weight_matrix()
                 [ 0  1  0]
                 [ 1 -4  1]
@@ -693,7 +693,7 @@ class WalkModel():
 
             EXAMPLE::
 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: m = ModelDict["FG-BMM-1.02"]
                 sage: m.weight_minor_matrix()
                 [ 0 -4  0  0]
@@ -732,7 +732,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import *
+                sage: from comb_walks.walkmodel import *
                 sage: m = WalkModel(N,S, [1,1,3]); m.steps()
                 [((0, 1), 1), ((0, -1), 1), ((1, 1), 3)]
                 sage: m = WalkModel(NW,S, [2,3,1], [2,5,5]); m.steps()
@@ -757,7 +757,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: m = RookModel
                 sage: all(m.weight(el) == 1 for el in [N,S,E,W])
                 True
@@ -791,7 +791,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import *
+                sage: from comb_walks.walkmodel import *
                 sage: m = WalkModel(N,S, [1,1,3]); m.nsteps()
                 3
                 sage: m = WalkModel(N,N,N,N,N); m.nsteps()
@@ -812,7 +812,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import *
+                sage: from comb_walks.walkmodel import *
                 sage: m = WalkModel(N, S, [1,1,3]); m.is_short_walk()
                 True
                 sage: m = WalkModel(N, [2,1]); m.is_short_walk()
@@ -836,7 +836,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import *
+                sage: from comb_walks.walkmodel import *
                 sage: m = WalkModel(N,NW,NE,E,SE); m.is_singular()
                 True
                 sage: m = WalkModel([-2,2], [2, -2], N); m.is_singular()
@@ -866,7 +866,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import *
+                sage: from comb_walks.walkmodel import *
                 sage: m = WalkModel(N,S,E,W); m.is_weighted()
                 False
                 sage: m = WalkModel(N,S, [1,1,2]); m.is_weighted()
@@ -914,7 +914,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import *
+                sage: from comb_walks.walkmodel import *
                 sage: m = WalkModel(N,E,S,W); m.step()
                 (x^2*y + x*y^2 + x + y)/(x*y)
                 sage: m.step() == (y + x + 1/y + 1/x)
@@ -961,7 +961,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import *
+                sage: from comb_walks.walkmodel import *
                 sage: m = WalkModel(N,S,E,W); m.kernel()
                 (-t)*x^2*y + (-t)*x*y^2 + x*y*z + (-t)*x*z^2 + (-t)*y*z^2
                 sage: m.kernel('P')
@@ -1029,7 +1029,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import *
+                sage: from comb_walks.walkmodel import *
                 sage: m = WalkModel(N,S,E,W); m.curve()
                 Closed subscheme of Projective Space of dimension 2 over Fraction Field of Univariate Polynomial Ring in t over Rational Field defined by:
                   (-t)*x^2*y + (-t)*x*y^2 + x*y*z + (-t)*x*z^2 + (-t)*y*z^2
@@ -1074,7 +1074,7 @@ class WalkModel():
             * In the Weierstrass model, the neutral point is always the point at the infinity
               line, i.e., `(0:1:0)`.
             * In other models, we compute the transformation from the Weierstrass model and the
-              corresponding model and use the method :func:`daeg1.alggeo.apply_map` on
+              corresponding model and use the method :func:`comb_walks.alggeo.apply_map` on
               `(0:1:0)` for getting the point.
 
             INPUT:
@@ -1082,7 +1082,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1.walkmodel import *
+                sage: from comb_walks.walkmodel import *
                 sage: m = WalkModel(N,E,S,W); m.neutral_point()
                 (0 : 0 : 1)
                 sage: m.neutral_point('W')
@@ -1601,7 +1601,7 @@ class WalkModel():
 
             OUTPUT::
 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: all(m.b(2)(x=x0/x1,y=y0/y1,z=1) == m.KR_f(2,'p') for m in AllModels if (not m.is_singular())) # long time
                 True
                 sage: all(m.b(1)(x=x0/x1,y=y0/y1) == pullback(m.iota(1,'p'))(m.KR_f(1, 'p')) for m in AllModels if (not m.is_singular())) # long time
@@ -1675,10 +1675,10 @@ class WalkModel():
 
             In this model, we compute the zeros of the denominator of the rational function and, since
             these denominators are bihomogeneous polynomials, we can use methods like
-            :func:`~daeg1.alggeo.zeros_bihom` to compute the roots of it and then compute the points
+            :func:`~comb_walks.alggeo.zeros_bihom` to compute the roots of it and then compute the points
             of the curve that annihilates that denominator.
 
-            Then we can use the method :func:`~daeg1.alggeo.asymptotics` to check whether these candidates
+            Then we can use the method :func:`~comb_walks.alggeo.asymptotics` to check whether these candidates
             are indeed poles or not.
 
             WARNING:
@@ -1819,7 +1819,7 @@ class WalkModel():
                 * ``model``: the model we are working with. See method :func:`model` for further information.
 
             OUTPUT:
-                This method returns a rational function. The method :func:`daeg1.alggeo.simplify_rational_variety` will be applied
+                This method returns a rational function. The method :func:`comb_walks.alggeo.simplify_rational_variety` will be applied
                 before returning, so some kind of cannonical output is expected.
 
             TODO:
@@ -1884,7 +1884,7 @@ class WalkModel():
             Boolean for having a pole at a point of order higher than 1.
 
             This method computes for a given point and function if it has a multiple pole
-            at a particular point. See method :func:`daeg1.alggeo.asymptotics` for further
+            at a particular point. See method :func:`comb_walks.alggeo.asymptotics` for further
             information.
 
             INPUT:
@@ -2262,7 +2262,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1 import * 
+                sage: from comb_walks import * 
                 sage: WalkModel.example_model().tau('p')
                 Scheme endomorphism of Closed subscheme of Product of projective spaces P^1 x P^1 ...
                 (-t)*x0*x1*y0^2 + (-t)*x0^2*y0*y1 + x0*x1*y0*y1 + (-t)*x1^2*y0*y1 + (-t)*x0*x1*y1^2
@@ -2308,7 +2308,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1 import * 
+                sage: from comb_walks import * 
                 sage: WalkModel.example_model().itau('p')
                 Scheme endomorphism of Closed subscheme of Product of projective spaces P^1 x P^1 ...
                 (-t)*x0*x1*y0^2 + (-t)*x0^2*y0*y1 + x0*x1*y0*y1 + (-t)*x1^2*y0*y1 + (-t)*x0*x1*y1^2
@@ -2383,7 +2383,7 @@ class WalkModel():
 
                 \tau^n(O) = O
 
-            Otherwise, this method relies on the method :func:`~daeg1.algeo.order_morphism`.
+            Otherwise, this method relies on the method :func:`~comb_walks.algeo.order_morphism`.
 
             INPUT:
                 * ``bound``: the bound for looking for the order.
@@ -2394,7 +2394,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: daeg1 import * 
+                sage: comb_walks import * 
                 sage: WalkModel.example_model().order_tau()
                 2
 
@@ -2454,7 +2454,7 @@ class WalkModel():
             
             EXAMPLE::
                 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: m = EllipticC[0]; m
                 Walk Model (wIA.01)
                 sage: m.solve_finite_order_tau(1)
@@ -2571,7 +2571,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: WalkModel.example_model().dy_dx()
                 (2*t*x*y + t*y^2 - y + t)/((-t)*x^2 + (-2*t)*x*y + x - t)
 
@@ -2609,7 +2609,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: WalkModel.example_model().dx_dy()
                 (t*x^2 + 2*t*x*y - x + t)/((-2*t)*x*y + (-t)*y^2 + y - t)
 
@@ -2657,7 +2657,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: m = NonEllipticC[0]; m.holomorphic_form()
                 Traceback (most recent call last):
                 ...
@@ -2701,7 +2701,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: m = NonEllipticC[0]; m.dx()
                 Traceback (most recent call last):
                 ...
@@ -2735,7 +2735,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: m = NonEllipticC[0]; m.dy()
                 Traceback (most recent call last):
                 ...
@@ -3090,7 +3090,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: from daeg1 import *
+                sage: from comb_walks import *
                 sage: WalkModel.example_model().name()
                 Example Model
                 sage: AllModels[0]

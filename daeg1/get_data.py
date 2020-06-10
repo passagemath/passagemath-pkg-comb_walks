@@ -3,7 +3,7 @@ r'''
 
     In this file we offer the methods required to create HTML or LaTeX tables with the
     desired data from the models for Walks in the quarter plane defined in the file
-    :mod:`daeg1.walkmodel`.
+    :mod:`comb_walks.walkmodel`.
 
     AUTHORS:
         - Antonio Jimenez-Pastor (2020-03-19): initial version

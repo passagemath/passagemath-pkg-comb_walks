@@ -95,7 +95,7 @@ def pullback(morphism, lift=True):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: # Testing a pullback between the ambient spaces
             sage: D = ProjectiveSpace(2, QQ, 'xyz'); CD = ProjectiveSpace(2,QQ, 'uvw')
             sage: x,y,z = D.gens(); u,v,w = CD.gens()
@@ -168,7 +168,7 @@ def simpl_morphism(morphism):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: D = ProjectiveSpace(2, QQ, 'xyz'); CD = ProjectiveSpace(2,QQ, 'uvw')
             sage: x,y,z = D.gens(); u,v,w = CD.gens()
             sage: C1 = D.subscheme(x^2-z*y); # usual parabola
@@ -302,7 +302,7 @@ def order_morphism(morphism, bound=10):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); x,y,z = P2.gens()
             sage: C = P2.subscheme(x^2-y*z)
             sage: h = Hom(C,C)([-x,y,z]); order_morphism(h)
@@ -313,10 +313,10 @@ def order_morphism(morphism, bound=10):
             sage: h = Hom(C,C2)([x,x,z]); order_morphism(h)
             +Infinity
 
-        In the package :mod:`daeg1.walkmodel`, we can find several examples of morphisms
+        In the package :mod:`comb_walks.walkmodel`, we can find several examples of morphisms
         that have finite order, and also some that have infinite order::
 
-            sage: from daeg1.walkmodel import *
+            sage: from comb_walks.walkmodel import *
             sage: for m in AllModels: # long time (> 15 seconds)
             ....:     if(order_morphism(m.iota(1,'p')) != 2):
             ....:         print("Error in the order of x-involution on the model %s" %m.name())
@@ -360,7 +360,7 @@ def is_identity(morphism):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); x,y,z = P2.gens()
             sage: is_identity(P2.identity_morphism())
             True
@@ -455,7 +455,7 @@ def zeros_bihom(poly, vars, alg_name='a', diff_names=True, algebraic=__default_a
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: F.<x,y> = QQ[]
             sage: zeros_bihom(F.one(), [x, y])
             []
@@ -592,7 +592,7 @@ def point_extension(point, variety):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P1P1 = ProjectiveSpace(1, QQ, 'x').cartesian_product(ProjectiveSpace(1, QQ, 'y'))
             sage: x0,x1,y0,y1 = P1P1.gens(); O = P1P1([0,1,0,1])
             sage: C = P1P1.subscheme(x0^2*y1^2 - x0*y0*x1*y1 + x1^2*y0^2); O in C
@@ -649,7 +649,7 @@ def simplify_rational_variety(func, variety):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); x,y,z = P2.gens()
             sage: simplify_rational_variety(x^2-3*y/z, P2) == x^2 - 3*y/z
             True
@@ -745,7 +745,7 @@ def apply_map(map, point):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); x,y,z = P2.gens(); O = P2([0,0,1])
             sage: C = P2.subscheme(x^2 - y*z); O in C
             True
@@ -838,7 +838,7 @@ def lin_change_to_zero(point):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: # Test for P2 and a plane curve
             sage: D = ProjectiveSpace(2, QQ, 'xyz'); x,y,z = D.gens(); O = D([0,0,1])
             sage: C = D.subscheme(x^3*z - 3*x^2*y^2 + 3*x*z^3 - z^4); O in C
@@ -973,7 +973,7 @@ def lin_change_from_zero(point):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: # Test for P2 and a plane curve
             sage: D = ProjectiveSpace(2, QQ, 'xyz'); x,y,z = D.gens(); O = D([0,0,1])
             sage: C = D.subscheme(x^2 - y*z); # the normal parabloa
@@ -1100,7 +1100,7 @@ def origin(variety):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P1P1 = ProjectiveSpace(1, QQ, 'x').cartesian_product(ProjectiveSpace(1, QQ, 'y'))
             sage: x0, x1, y0, y1 = P1P1.gens()
             sage: origin(P1P1)
@@ -1166,7 +1166,7 @@ def is_hypersurface(variety):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P1P1 = ProjectiveSpace(1, QQ, 'x').cartesian_product(ProjectiveSpace(1, QQ, 'y'))
             sage: x0, x1, y0, y1 = P1P1.gens()
             sage: is_hypersurface(P1P1)
@@ -1202,7 +1202,7 @@ def is_prod_point(point):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); O = origin(P2)
             sage: is_prod_point(O)
             False
@@ -1236,7 +1236,7 @@ def is_smooth_at(variety, point):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); x, y, z = P2.gens()
             sage: C = P2.subscheme(x^2-y*z); # normal parabola
             sage: O = origin(P2); P = P2([0,1,0]); Q = P2([1,0,1])
@@ -1292,7 +1292,7 @@ def homogenize_function_on_variety(func, variety):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); x,y,z = P2.gens()
             sage: C = P2.subscheme(x^3 - 3*y*z^2 + x^2*z -z^3)
             sage: homogenize_function_on_variety(x, C)
@@ -1374,7 +1374,7 @@ def dehomogenize_at_zero(variety):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); x, y, z = P2.gens()
             sage: C = P2.subscheme(x^2 - y*z); dehomogenize_at_zero(C)
             [x^2 - y]
@@ -1417,7 +1417,7 @@ def eval_at_zero_on_variety(polys, variety):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); x,y,z = P2.gens()
             sage: C = P2.subscheme(x^2 - y*z); # usual parabola
             sage: eval_at_zero_on_variety([x^2, y], C)
@@ -1486,7 +1486,7 @@ def decompose_at_zero(curve, main_var=None):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: R.<x,y> = QQ[]
             sage: f = x^4 + 2*y^2*x^2 - y; decompose_at_zero(f)
             (4, 1, -1, 2*x^2*y, x, y)
@@ -1689,7 +1689,7 @@ def order_at_variety(rational, variety, main_var=None):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(QQ, 2, 'xyz'); x,y,z = P2.gens()
             sage: C = P2.subscheme(x^3 - 3*x*y*z + 7*y^2*z - y*z^2)
             sage: order_at_variety(x, C)
@@ -1771,7 +1771,7 @@ def asymptotics(variety, func, point):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); x,y,z = P2.gens()
             sage: C = P2.subscheme(x^2 - y*z); # the usual parabola
             sage: O = origin(C); P = C([0,1,0]); # origin and the point at infinity
@@ -1865,7 +1865,7 @@ def polar_part(variety, func, point, sequence=False):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); x,y,z = P2.gens()
             sage: C = P2.subscheme(x^3 - 3*y^2*z + x^2*z + y*z^2); O = origin(C)
             sage: polar_part(C, 1/x^3 - x/y, O)
@@ -1940,7 +1940,7 @@ def expand_at_point(variety, func, point, bound):
 
         EXAMPLES::
 
-            sage: from daeg1.alggeo import *
+            sage: from comb_walks.alggeo import *
             sage: P2 = ProjectiveSpace(2, QQ, 'xyz'); x,y,z = P2.gens()
             sage: C = P2.subscheme(x^3 - 3*y^2*z + x^2*z + y*z^2); O = origin(C)
             sage: expand_at_point(C,1/x^3, O, 10)

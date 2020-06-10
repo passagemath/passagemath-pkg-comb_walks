@@ -6,7 +6,7 @@ VERSION=$(shell cat ./VERSION)
 SAGE=sage
 
 # Package folder
-PACKAGE=daeg1
+PACKAGE=comb_walks
 
 all: install doc test
 	
