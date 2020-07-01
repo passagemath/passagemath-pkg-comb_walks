@@ -1,4 +1,4 @@
-# **Walk Models with elliptic kernel function** 
+# **Walk Models with elliptic kernel function [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fgitlab.inria.fr%2Fdiscretewalks%2Fcomb_walks.git/master?filepath=comb_walks_demo.ipynb)** 
 
 `comb_walks` is a Sage package for understanding and getting data for generating functions of Walks in the 
 Quarter plane where the kernel function describes an elliptic curve. However, the code is implemented in such
@@ -17,6 +17,10 @@ running the command
 or using the `sage -pip` command on the repository:
 
    `sage -pip [--user] install .`
+
+If the user does not want to install the package, or does not have Sage installed, he can 
+launch and try the demo [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fgitlab.inria.fr%2Fdiscretewalks%2Fcomb_walks.git/master?filepath=comb_walks_demo.ipynb)
+
    
 ## **2. Using the package**
 
