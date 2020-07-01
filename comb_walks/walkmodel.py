@@ -3055,24 +3055,25 @@ class WalkModel():
                       This value is set to ``"blue"`` by default.
                     * ``end_color``: a valid input for ``rgbcolor``. This will be the color from the beginning of the walk.
                       This value is set to ``"red"`` by default.
+                    * Other options will be directly passed to the constructor of arrows in ``sage.plot``
         '''
         from sage.plot.arrow import arrow
         from sage.plot.colors import rgbcolor
         _,steps = self.random_walk(size, start, True, restriction)
 
         ## Defining the colors for the arrows
-        init_color = rgbcolor(kwds.get('init_color', "blue"), 'rgb')
-        end_color = rgbcolor(kwds.get('end_color', "red"), 'rgb')
+        init_color = rgbcolor(kwds.pop('init_color') if 'init_color' in kwds else "blue", 'rgb')
+        end_color = rgbcolor(kwds.pop('end_color') if 'end_color' in kwds else "red", 'rgb')
         def get_color(it):
             pos = float(it)/(size-1)
             return rgbcolor(tuple((1-pos)*init_color[i] + pos*end_color[i] for i in range(3)), 'rgb')
 
-        result = arrow(start, steps[0],color=init_color); current = tuple(start[j]+steps[0][j] for j in range(2))
+        result = arrow(start, steps[0],color=init_color,**kwds); current = tuple(start[j]+steps[0][j] for j in range(2))
 
         ## Building the arrows
         for i in range(1,len(steps)):
             next = tuple(current[j]+steps[i][j] for j in range(2))
-            result += arrow(current, next, color=get_color(i))
+            result += arrow(current, next, color=get_color(i),**kwds)
             current = next
 
         ## Configuring the aspect of the plot
