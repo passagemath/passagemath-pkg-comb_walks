@@ -153,7 +153,7 @@ def pullback(morphism, lift=True):
 
     return func
 
-@dLogFunction
+@dLogFunction()
 def simpl_morphism(morphism):
     r'''
         Static method that simplifies a morphism between projectives varieties.
@@ -281,7 +281,7 @@ def __simpl_polynomials_gcd_content(*polys):
     return [el.numerator() for el in result]
 
 _CACHE_ORDER_MORPHISM = {}
-@dLogFunction
+@dLogFunction()
 def order_morphism(morphism, bound=10):
     r'''
         Method for computing the order of a morphism up to a bound.
@@ -344,7 +344,7 @@ def order_morphism(morphism, bound=10):
 
     return _CACHE_ORDER_MORPHISM[key]
 
-@dLogFunction
+@dLogFunction()
 def is_identity(morphism):
     r'''
         Method to check if a morphism is the identity morphism or not.
@@ -404,7 +404,7 @@ def is_identity(morphism):
 
     return True
 
-@dLogFunction
+@dLogFunction()
 def zeros_bihom(poly, vars, alg_name='a', diff_names=True, algebraic=__default_algebraic_extension):
     r'''
         Method to compute the zeros of a bivariate homogeneous form in the given variables.
@@ -566,7 +566,7 @@ def zeros_bihom(poly, vars, alg_name='a', diff_names=True, algebraic=__default_a
     ## Returning the list of points
     return result
 
-@dLogFunction
+@dLogFunction()
 def point_extension(point, variety):
     r'''
         Method to create a point structure for a variety even with extensions on the field
@@ -634,7 +634,7 @@ def point_extension(point, variety):
 
     return extended_variety([FF(coord) for coord in point])
 
-@dLogFunction
+@dLogFunction()
 def simplify_rational_variety(func, variety):
     r'''
         Method that simplifies rational functions using the equation of a variety.
@@ -716,7 +716,7 @@ def simplify_on_affine_curve(func, curve_equation, trailing_var):
     return K(str(Fe(str(func)))) # we cast 'func' to Fe and then we convert it back.
 
 _CACHE_APPLY_MAP = {}
-@dLogFunction
+@dLogFunction()
 def apply_map(map, point):
     r'''
         Method to apply a map between projective varieties.
@@ -821,7 +821,7 @@ def apply_map(map, point):
 
     return _CACHE_APPLY_MAP[key]
 
-@dLogFunction
+@dLogFunction()
 def lin_change_to_zero(point):
     r'''
         Method to get a dictionary of linear change of coordinates to the origin.
@@ -957,7 +957,7 @@ def lin_change_to_zero(point):
                     result[str(splitting_vars[i][j])] = splitting_vars[i][j] + split[j]/split[k]
     return result, final_vars
 
-@dLogFunction
+@dLogFunction()
 def lin_change_from_zero(point):
     r'''
         Method to get a dictionary of linear change of coordinates from the origin.
@@ -1391,7 +1391,7 @@ def dehomogenize_at_zero(variety):
     change, _ = lin_change_to_zero(O)
     return [poly(**change) for poly in variety.defining_polynomials()]
 
-@dLogFunction
+@dLogFunction()
 def eval_at_zero_on_variety(polys, variety):
     r'''
         Method to evaluate a list of polynomials at the origin over a curve
@@ -1447,7 +1447,7 @@ def eval_at_zero_on_variety(polys, variety):
     return [residues[i][1] if orders[i] == min_order else 0 for i in range(len(residues))]
 
 _CACHE_CURVE_DEC = {}
-@dLogFunction
+@dLogFunction()
 def decompose_at_zero(curve, main_var=None):
     r'''
         Method that decomposes an affine curve at `(0,0)` in a convinient way.
@@ -1584,7 +1584,7 @@ def decompose_at_zero(curve, main_var=None):
 
     return _CACHE_CURVE_DEC[(curve,ox)]
 
-@dLogFunction
+@dLogFunction()
 def __order_poly_at_variety(poly, variety, main_var=None):
     r'''
         Method to compute the order and the residue of a polynomial at the origin on an algebraic variety.
@@ -1659,7 +1659,7 @@ def __order_poly_at_variety(poly, variety, main_var=None):
     dlogging.log(22, "alggeo:GOPAC: final order %s. Residue: %s" %(result[0],result[1]))
     return result
 
-@dLogFunction
+@dLogFunction()
 def order_at_variety(rational, variety, main_var=None):
     r'''
         Method to compute the order and the residue of a rational function at `(0,0)` over an affine curve.
@@ -1738,7 +1738,7 @@ def order_at_variety(rational, variety, main_var=None):
     return (on-od, rn/rd, x)
 
 _CACHE_ASYMPTOTICS = {}
-@dLogFunction
+@dLogFunction()
 def asymptotics(variety, func, point):
     r'''
         Method to compute a asymptotic approximation of a rational function.
@@ -1825,7 +1825,7 @@ def asymptotics(variety, func, point):
     return _CACHE_ASYMPTOTICS[key]
 
 _CACHE_POLAR_PART = {}
-@dLogFunction
+@dLogFunction()
 def polar_part(variety, func, point, sequence=False):
     r'''
         Method that gets the polar part at one point of a rational function.

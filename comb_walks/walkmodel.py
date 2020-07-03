@@ -1114,7 +1114,7 @@ class WalkModel():
         return self.__neutral[model]
 
     ## TODO: remove --> move to alggeo
-    @dLogFunction
+    @dLogFunction()
     def intersection(self, poly, model="A"):
         from sage.categories.pushout import pushout
         model = self.model(model)
@@ -1193,10 +1193,12 @@ class WalkModel():
         try:
             self.__get_maple_info()
         except NoMapleError:
-            try:
-                self.__get_Weierstrass_form()
-            except WeierstrassFormError:
-                self.__get_sage_info()
+            pass
+        try:
+            self.__get_Weierstrass_form()
+        except WeierstrassFormError:
+            pass
+        self.__get_sage_info()
 
             
 
@@ -2039,7 +2041,7 @@ class WalkModel():
         to_apply = [pitau**(-el) if el < 0 else ptau**el for el in cum_jump]
         return simplify_rational_variety(sum(to_apply[i](hpp[i]) for i in range(len(hpp))), self.curve(model))
 
-    @dLogFunction
+    @dLogFunction()
     def reduction(self, func, poles=None, jumps=None, model="P"):
         r'''
             Method that computes the decomposition of a rational function w.r.t. `\tau`.
@@ -2123,7 +2125,7 @@ class WalkModel():
 
         return self.__reductions[key]
 
-    @dLogFunction
+    @dLogFunction()
     def telescoping(self, func, model="P"):
         r'''
             Method to compute a telescoper (of possible) of a rational function over the kernel curve.
@@ -2771,7 +2773,7 @@ class WalkModel():
 
         return simplify_rational_variety(1/f, self.map('a','w').domain())(z=1)
 
-    @dLogFunction
+    @dLogFunction()
     def derivative(self, f, model="A"):
         r'''
             Method for computing the derivative of a rational function over the curve.
@@ -2801,7 +2803,7 @@ class WalkModel():
     ## Private methods
 
 
-    @dLogFunction
+    @dLogFunction("info")
     def __get_Weierstrass_form(self, name='r'):
         r'''
             Method to compute the Weiertrass form and the birational maps for a biquadratic curve.
@@ -2815,8 +2817,9 @@ class WalkModel():
 
             If any error happend, a :class:`WeiertrassFormException` is raised
         '''
+        raise NotImplementedError("method __get_Weierstrass_form not implemented")
 
-    @dLogFunction
+    @dLogFunction("info")
     def __get_maple_info(self, name="r"):
         if(not name in self.__maple):
             from sage.interfaces.maple import maple
@@ -2907,7 +2910,7 @@ class WalkModel():
             self.__maple[name] = (UVW,XYZ,new_eq)
         return self.__maple[name]
 
-    @dLogFunction
+    @dLogFunction("info")
     def __get_sage_info(self, namr='r'):
         r'''
             Method to get the Weierstrass normal form of the model
@@ -2917,7 +2920,7 @@ class WalkModel():
         '''
         raise NotImplementedError("The method __get_sage_info is not implemented")
 
-    @dLogFunction
+    @dLogFunction()
     def alg_extension(self, polynomial, n=None):
         r'''
             Method to compute a uniform algebraic extension through all computations in the model.

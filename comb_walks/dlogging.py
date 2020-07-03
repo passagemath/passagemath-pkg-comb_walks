@@ -100,7 +100,7 @@ def open_function(name):
 def close_function(name):
     if(is_session()): dLogger._DLOGGER.close_function(name)
 
-def dLogFunction(func):
+def dLogFunction(level=ERROR):
     r'''
         Decorator for wrapping methods with the dLogger
 
@@ -110,19 +110,24 @@ def dLogFunction(func):
         This will automatically increase the identation of the dLogger and check the
         initial and final time of the method.
     '''
-    @wraps(func)
-    def dLogged(*args, **kwds):
-        open_function(func.__name__)
-        try:
-            output = func(*args, **kwds)
-        except Exception as e:
-            error("Function %s closed by an error: %s" %(func.__name__, e))
-            close_function(func.__name__)
-            raise e
+    levels = {"error": ERROR, "warning": WARNING, "info": INFO}
+    level = levels.get(level, ERROR)
 
-        close_function(func.__name__)
-        return output
-    return dLogged
+    def inner(func):
+        @wraps(func)
+        def dLogged(*args, **kwds):
+            open_function(func.__name__)
+            try:
+                output = func(*args, **kwds)
+            except Exception as e:
+                log(level,"Function %s closed by an error: %s" %(func.__name__, e))
+                close_function(func.__name__)
+                raise e
+
+            close_function(func.__name__)
+            return output
+        return dLogged
+    return inner
 
 class dLogger(Logger):
     r'''
