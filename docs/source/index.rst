@@ -53,6 +53,7 @@ comb_walks
 
    alggeo
    walkmodel
+   exceptions
    
 Indices and Tables
 ==================
