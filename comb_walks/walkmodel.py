@@ -37,16 +37,11 @@ from sage.structure.coerce_exceptions import CoercionException
 from .alggeo import (apply_map, zeros_bihom, point_extension, simpl_morphism, 
     simplify_rational_variety, pullback, asymptotics, polar_part, expand_at_point,
     order_morphism)
+from .exceptions import (NonEllipticError, NoMapleError, WeierstrassFormError)
 from . import dlogging
 from .dlogging import dLogFunction
 
 
-## Exception classes
-class NonEllipticError(TypeError):
-    r'''
-        Type error for showing a model is not elliptic
-    '''
-    pass
 
 class WalkModel():
     r'''
@@ -1007,7 +1002,7 @@ class WalkModel():
             elif(model == "W"):
                 if(not self.is_elliptic()):
                     raise NonEllipticError("The kernel is not a elliptic curve --> No Weierstrass model")
-                self.__get_maple_info()
+                self.weierstrass_form()
 
         return self.__kernel[model]
 
@@ -1123,7 +1118,7 @@ class WalkModel():
     def intersection(self, poly, model="A"):
         from sage.categories.pushout import pushout
         model = self.model(model)
-        poly = self.ring(model)(poly)
+        poly = pushout(self.ring(model), poly.parent())(poly)
 
         if(model == "A" or model == "W"): # Case with three variables
             x,y,z = self.vars(model)
@@ -1177,6 +1172,33 @@ class WalkModel():
                 else:
                     dlogging.warning("WalkModel.intersection: found a difficult factor in %s --> %s (Ignoring these points)" %(poly, f))
             return list(set(result))
+
+    @cached_method
+    def weierstrass_form(self):
+        r'''
+            Method that computes the Weierstrass Normal Form of the kernel curve.
+
+            This method computes (if possible) the Weierstrass Normal form of the kernel equation. 
+            This will provide not only the new equation for the curve in the coordinates `(u:v:w)`
+            related with the ``weierstrass`` representation (see method :func`model`), but also
+            the birational maps between that representation and the representation with 
+            coordinates `(x_0:x_1, y_0:y_1)`.
+
+            This method tries first to use Maple to get this result. If this fails for any particular
+            reason, we fall back into our own computations. If this also fails, we may do a partial
+            result using the current implementation in Sage for computing the Weierstrass Form.
+        '''
+        if(not self.is_elliptic()):
+            raise NonEllipticError("The curve is not elliptic --> No Weierstrass normal form can be computed")
+        try:
+            self.__get_maple_info()
+        except NoMapleError:
+            try:
+                self.__get_Weierstrass_form()
+            except WeierstrassFormError:
+                self.__get_sage_info()
+
+            
 
     @cached_method
     def add_P(self, point, model="W"):
@@ -2777,10 +2799,34 @@ class WalkModel():
 
     ##########################################################################################
     ## Private methods
+
+
+    @dLogFunction
+    def __get_Weierstrass_form(self, name='r'):
+        r'''
+            Method to compute the Weiertrass form and the birational maps for a biquadratic curve.
+
+            This method focuses on computing the Weiertrass normal form of an elliptic curve
+            defined with a biquadratic polynomial `K(x,y;t)`. This method also computes the two
+            birational maps from the curve in the coordinates `x` and `y`.
+
+            This method is equivalent to the method :func:`__get_maple_info` but without using any 
+            extra code from Sage.
+
+            If any error happend, a :class:`WeiertrassFormException` is raised
+        '''
+
     @dLogFunction
     def __get_maple_info(self, name="r"):
         if(not name in self.__maple):
             from sage.interfaces.maple import maple
+            ## Checking that Maple is available
+            try:
+                maple('x')
+            except TypeError:
+                raise NoMapleError()
+
+            ## Doing the usual computations
             R_UVW = self.ring('W'); F_UVW = R_UVW.fraction_field()
             R_XYZ = self.ring('A'); F_XYZ = R_XYZ.fraction_field()
             u,v,w = self.vars('W')
@@ -2860,6 +2906,16 @@ class WalkModel():
 
             self.__maple[name] = (UVW,XYZ,new_eq)
         return self.__maple[name]
+
+    @dLogFunction
+    def __get_sage_info(self, namr='r'):
+        r'''
+            Method to get the Weierstrass normal form of the model
+
+            This method relies on methods from Sage to compute the normal form of the kernel equation of the model.
+            The results may be incomplete, resulting in further errors through the executions.
+        '''
+        raise NotImplementedError("The method __get_sage_info is not implemented")
 
     @dLogFunction
     def alg_extension(self, polynomial, n=None):
