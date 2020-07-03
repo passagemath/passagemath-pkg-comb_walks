@@ -2957,12 +2957,12 @@ class WalkModel():
                 return F, [-polynomial[0]/polynomial[1]], 0
             elif(all(polynomial[i] == 0 for i in range(1, polynomial.degree())) and polynomial[0]/polynomial[polynomial.degree()] == 1): # polynomial = ax^d + a
                 if(polynomial.degree() == 2): name = "i" # the usual imaginary number
-                else: name = "ur_%d" %polynomial.degree() # a primitive d-root of unity
+                else: name = "ur_%d" %(2*polynomial.degree()) # a primitive 2d-root of unity
 
                 F_ext = F.extension(polynomial, name) # extending the field
                 self.__field_F = F_ext
 
-                return F_ext, [F_ext(name)**i for i in range(1,polynomial.degree()+1)], 1
+                return F_ext, [F_ext(name)**(2*i-1) for i in range(1,polynomial.degree()+1)], 1
             elif(polynomial.degree() == 2):
                 F_ext = F.extension(polynomial, name)
                 self.__field_F = F_ext
