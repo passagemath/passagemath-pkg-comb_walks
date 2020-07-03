@@ -104,11 +104,15 @@ def dLogFunction(level=ERROR):
     r'''
         Decorator for wrapping methods with the dLogger
 
-        This decorator allows the user tu use the decorator ``@dLogFunction`` for wrap all
+        This decorator allows the user tu use the decorator ``@dLogFunction()`` for wrap all
         the functions that want to control the time using a dLogger.
 
         This will automatically increase the identation of the dLogger and check the
         initial and final time of the method.
+
+        Moreover, the argument ``level`` that can be set to ``"error"``, ``info``,
+        ``warning`` or any ``int``, allows the user to determine the level of the logger
+        used to print the exceptions raised on a function.
     '''
     levels = {"error": ERROR, "warning": WARNING, "info": INFO}
     level = levels.get(level, ERROR)
