@@ -2948,8 +2948,6 @@ class WalkModel():
 
         a,b,c,d,e,f = coeffs
 
-        print(a,b,c,d,e,f)
-
         if(f != 0):
             raise WeierstrassFormError("The coefficient u*v is not zero")
         u_shift = c/(3*d); v_shift = e/2
