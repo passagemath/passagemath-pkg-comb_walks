@@ -30,7 +30,7 @@ r'''
 # Sage imports
 from sage.all import (ProjectiveSpace, QQ, ZZ, random, ceil, cached_method, parent,
     Hom, binomial, FractionField, vector, Matrix, Poset, DiGraph, Infinity,
-    PolynomialRing, gcd, Integer, randint)
+    PolynomialRing, gcd, Integer, randint, solve, SR)
 from sage.structure.coerce_exceptions import CoercionException
 
 # Local imports
@@ -217,7 +217,7 @@ class WalkModel():
         self.__B = {} # Variable for the splitting of the kernel in terms of x (keys are (model,i))
         self.__discriminant = {} # Variable for the discriminants for the krnel function (keys are (model, i))
 
-        self.__maple = {} # Variable for saving the data got from Maple
+        self.__weierstrass = None # Variable for saving the data got from Maple
 
         # Variables for KR methods
         self.__KR_f = {}
@@ -470,6 +470,47 @@ class WalkModel():
                 True
         '''
         return self.ambient(model).coordinate_ring()
+
+    def field(self,model):
+        r'''
+            Method to get the fraction field of the coordinate ring of the ambient space of the curve depending on the model required.
+
+            Since there are three different models, we have three different ambient spaces:
+                * For model ``A``: rational functions in `x`, `y`, `z` over `Q(t)`.
+                * For model ``W``: rational functions in `u`, `v`, `w` over `Q(t)`.
+                * For model ``P``: rational functions in `x_0`, `x_1`, `y_0`, `y_1` over `Q(t)`.
+
+            REMARK: 
+                * This method will return a new element if we find a needed algebraic extension.
+                  Hence, the use of this method instead of a variable is highly recommended.
+
+            INPUT:
+                * ``model``: the type of ambient space we look. See method :func:`model` for further information.
+
+            EXAMPLES::
+
+                sage: from comb_walks.walkmodel import WalkModel; m = WalkModel.example_model()
+                sage: x,y,z = m.vars(1); u,v,w = m.vars(2); x0,x1,y0,y1 = m.vars(3); t = m.pars()
+                sage: all(m.ring(el) == FractionField(m.base_ring()[x,y,z]) for el in [1,'xyz','xy','a','A'])
+                True
+                sage: all(m.ring(el) == FractionField(m.base_ring()[u,v,w]) for el in [2, 'uvw', 'uv', 'w', 'weierstrass', 'W'])
+                True
+                sage: all(m.ring(el) == FractionField(m.base_ring()[x0,x1,y0,y1]) for el in [3, 'x0x1y0y1', 'x0y0', 'p', 'projective', 'P'])
+                True
+
+            These relation between the :func:`base_ring` and the coordinate rings has to be preserved even
+            after changing the base ring (see method :func:`change_ring`)::
+
+                sage: nF = FractionField(NumberField(QQ['i']('i^2+1'), 'i')[t])
+                sage: m.change_ring(nF)
+                sage: all(m.ring(el) == FractionField(m.base_ring()[x,y,z]) for el in [1,'xyz','xy','a','A'])
+                True
+                sage: all(m.ring(el) == FractionField(m.base_ring()[u,v,w]) for el in [2, 'uvw', 'uv', 'w', 'weierstrass', 'W'])
+                True
+                sage: all(m.ring(el) == FractionField(m.base_ring()[x0,x1,y0,y1]) for el in [3, 'x0x1y0y1', 'x0y0', 'p', 'projective', 'P'])
+                True
+        '''
+        return self.ambient(model).coordinate_ring().fraction_field()
 
     def vars(self, model):
         r'''
@@ -1188,19 +1229,53 @@ class WalkModel():
             reason, we fall back into our own computations. If this also fails, we may do a partial
             result using the current implementation in Sage for computing the Weierstrass Form.
         '''
-        if(not self.is_elliptic()):
-            raise NonEllipticError("The curve is not elliptic --> No Weierstrass normal form can be computed")
-        try:
-            self.__get_maple_info()
-        except NoMapleError:
-            pass
-        try:
-            self.__get_Weierstrass_form()
-        except WeierstrassFormError:
-            pass
-        self.__get_sage_info()
+        if(self.__weierstrass is None):
+            if(not self.is_elliptic()):
+                raise NonEllipticError("The curve is not elliptic --> No Weierstrass normal form can be computed")
+            try:
+                U,V,X,Y,new_eq,F = self.__get_maple_info()
+            except NoMapleError:
+                U,V,X,Y,new_eq,F = self.__get_weierstrass_form()
 
-            
+            ## Creating the corresponding maps
+            U = U(x=x/z,y=y/z); V = V(x=x/z, y=y/z)
+            try:
+                g_W = gcd(U.denominator(), V.denominator())
+                lcm_W = self.ring('a')(U.denominator()*V.denominator()//g_W)
+                factor_U = self.ring('a')(V.denominator()//g_W); factor_V = self.ring('a')(U.denominator()//g_W)
+            except NotImplementedError:
+                lcm_W = U.denominator()*V.denominator()
+                factor_U = V.denominator(); factor_V = U.denominator()
+
+            X = X(u=u/w,v=v/w); Y = Y(u=u/w, v=v/w)
+            try:
+                g_A = gcd(X.denominator(), Y.denominator())
+                lcm_A = self.ring('w')(X.denominator()*Y.denominator()//g_A)
+                factor_X = self.ring('w')(Y.denominator()//g_A); factor_Y = self.ring('w')(X.denominator()//g_A)
+            except NotImplementedError:
+                lcm_A = X.denominator()*Y.denominator()
+                factor_X = Y.denominator(); factor_Y = X.denominator()
+
+            UVW = tuple([self.ring('a')(el) for el in (U.numerator()*factor_U, V.numerator()*factor_V, lcm_W)])
+            XYZ = tuple([self.ring('w')(el) for el in (X.numerator()*factor_X, Y.numerator()*factor_Y, lcm_A)])
+
+            new_eq = self.ring('W')(str(self.ring('w')(new_eq).homogenize(w)))
+            self.__kernel['W'] = self.ring('W')(str(new_eq))
+
+            ## Assigning the result to the variables of the Model
+
+            if(WalkModel._F != F): #self.change_ring(F)
+                ## Creating extended curves
+                self.__maps[('W','A')] = simpl_morphism(Hom(self.curve('W').change_ring(F), self.curve('A').change_ring(F))(XYZ))
+                self.__maps[('A','W')] = simpl_morphism(Hom(self.curve('A').change_ring(F), self.curve('W').change_ring(F))(UVW))
+                self.__maps[('A','P')] = self.map('A','P').change_ring(F)
+                self.__maps[('P','A')] = self.map('P','A').change_ring(F)
+            else:
+                self.__maps[('W','A')] = simpl_morphism(Hom(self.curve('W'), self.curve('A'))(XYZ))
+                self.__maps[('A','W')] = simpl_morphism(Hom(self.curve('A'), self.curve('W'))(UVW))
+
+            self.__weierstrass = (UVW,XYZ,new_eq)
+        return self.__weierstrass
 
     @cached_method
     def add_P(self, point, model="W"):
@@ -2801,10 +2876,8 @@ class WalkModel():
 
     ##########################################################################################
     ## Private methods
-
-
     @dLogFunction("info")
-    def __get_Weierstrass_form(self, name='r'):
+    def __get_weierstrass_form(self, name='r'):
         r'''
             Method to compute the Weiertrass form and the birational maps for a biquadratic curve.
 
@@ -2817,108 +2890,139 @@ class WalkModel():
 
             If any error happend, a :class:`WeiertrassFormException` is raised
         '''
-        raise NotImplementedError("method __get_Weierstrass_form not implemented")
+        x0,x1,y0,y1 = self.vars('P')
+        x,y,_ = self.vars('A')
+        u,v,_ = self.vars('W')
+
+        ## Getting a point on the curve
+        candidates = list(set(self.intersection(x0, 'P') + self.intersection(x1,'P') + self.intersection(y0, 'P') + self.intersection(y1,'P')))
+
+        ## Sorting the candidates between rational and algebraic points
+        rational = [point for point in candidates if all(el in QQ for el in [point[0][0], point[0][1], point[1][0], point[1][1]])]
+        algebraic = [point for point in candidates if not(point in rational)]
+        
+        ## Trying to get only a rational point (better than algebraic)
+        P = None
+        for point in rational + algebraic:
+            ## Checking if the point is finite
+            if(point[0][1] == 0):
+                point = apply_map(self.iota(2, 'P'), point)
+            if(point[1][1] == 0):
+                point = apply_map(self.iota(1, 'P'), point)
+            if(point[0][1] != 0 and point[1][1] != 0):
+                P = point
+                break
+
+        if(P is None):
+            raise WeierstrassFormError("No candidate is a finite point")
+                
+        F = P.scheme().base_ring()
+        
+        Udenom = (P[0][1]*x0 - P[0][0]*x1)*(P[1][1]*y0 - P[1][0]*y1)
+        Q1 = apply_map(self.iota(1,'P'), P); Q2 = apply_map(self.iota(2,'P'), P)
+        Unumer = (Q2[0][1]*x0 - Q2[0][0]*x1)*(Q1[1][1]*y0 - Q1[1][0]*y1)
+        U = Unumer / Udenom
+
+        ## U has only one pole at P of order -2
+        assert (self.poles(U, 'P') == [P] and asymptotics(self.curve('P'), U, P)[0] == -2), "The function U has different poles than expected"
+
+        ## V can be computed as the derivative of U
+        eval_dic = {'x0': x, 'x1': 1, 'y0': y, 'y1': 1}
+        back_dic = {'x': x0/x1, 'y': y0/y1}
+            
+        Uxy = U(**eval_dic); Kxy = self.kernel('A')(z=1)
+        V = simplify_rational_variety((Kxy.derivative(y)*Uxy.derivative(x) - Kxy.derivative(x)*Uxy.derivative(y))(**back_dic), self.curve('P'))
+        Vxy = V(**eval_dic)
+        assert (self.poles(V, 'P') == [P] and asymptotics(self.curve('P'), V, P)[0] == -3), "The function V has different poles than expected"
+
+        ## Now we can compute the 7 functions that are linearly dependent
+        ## 1, u, u^2, u^3, v, v*u, v^2
+        funcs = [1, U, U**2, U**3, V, V*U, V**2]
+
+        ## And we can compute the relation using Linear Algebra
+        system_Matrix = Matrix([[el.get(i, 0) for i in range(-6,1)] for el in [expand_at_point(self.curve('P'),f,P,1)[0] for f in funcs[:-1]]])
+        system_lhs = vector([expand_at_point(self.curve('P'), funcs[-1], P, 1)[0].get(i,0) for i in range(-6,1)])
+        coeffs = system_Matrix.solve_left(-system_lhs)
+
+        assert (simplify_rational_variety(sum([funcs[i]*coeffs[i] for i in range(len(funcs)-1)]) + funcs[-1], self.curve('P')) == 0), "The equation does not hold"
+
+        a,b,c,d,e,f = coeffs
+
+        print(a,b,c,d,e,f)
+
+        if(f != 0):
+            raise WeierstrassFormError("The coefficient u*v is not zero")
+        u_shift = c/(3*d); v_shift = e/2
+
+
+        X, Y = [self.ring('w').fraction_field()(el.operands()[1])(u=u-u_shift,v=v-v_shift) for el in solve([SR(Uxy)-SR(u)==0,SR(Vxy)-SR(v)==0], [SR(x),SR(y)])[0]]
+        Uxy += u_shift; Vxy += v_shift
+        ## Creating the new equation
+        
+        new_eq = v**2 + d*u**3 + ((-c**2/3 + b*d)/d)*u + ((-(d**2*e**2)/4 + (2*c**3)/27 - (b*c*d)/3 + a*d**2)/d**2)
+
+        return self.field('A')(Uxy), self.field('A')(Vxy), self.field('W')(X), self.field('W')(Y), self.ring('W')(new_eq), F
 
     @dLogFunction("info")
     def __get_maple_info(self, name="r"):
-        if(not name in self.__maple):
-            from sage.interfaces.maple import maple
-            ## Checking that Maple is available
-            try:
-                maple('x')
-            except TypeError:
-                raise NoMapleError()
+        from sage.interfaces.maple import maple
+        ## Checking that Maple is available
+        try:
+            maple('x')
+        except TypeError:
+            raise NoMapleError()
 
-            ## Doing the usual computations
-            R_UVW = self.ring('W'); F_UVW = R_UVW.fraction_field()
-            R_XYZ = self.ring('A'); F_XYZ = R_XYZ.fraction_field()
-            u,v,w = self.vars('W')
-            x,y,z = self.vars('A')
+        ## Doing the usual computations
+        R_UVW = self.ring('W'); F_UVW = R_UVW.fraction_field()
+        R_XYZ = self.ring('A'); F_XYZ = R_XYZ.fraction_field()
+        u,v,w = self.vars('W')
+        x,y,z = self.vars('A')
 
-            ## Using Maple to get nicer mappings to Weierstrass form
-            maple.restart()
-            _ = maple("assign(('eqWF', 'U', 'V', 'X', 'Y')=op(algcurves[Weierstrassform](%s, %s, %s, %s, %s, Weierstrass)))" %(self.kernel("A")(z=1),x,y,u,v))
-            U = maple.get("U"); V = maple.get("V"); X = maple.get("X"); Y = maple.get("Y"); new_eq = maple.get("eqWF")
+        ## Using Maple to get nicer mappings to Weierstrass form
+        maple.restart()
+        _ = maple("assign(('eqWF', 'U', 'V', 'X', 'Y')=op(algcurves[Weierstrassform](%s, %s, %s, %s, %s, Weierstrass)))" %(self.kernel("A")(z=1),x,y,u,v))
+        U = maple.get("U"); V = maple.get("V"); X = maple.get("X"); Y = maple.get("Y"); new_eq = maple.get("eqWF")
 
-            ## At this point we have strings with the result of the Maple computation.
-            ## Getting the algebraic elements
-            algebraic_equations = list(set([el.split(")")[0] for el in sum([line.split("RootOf(")[1:] for line in [U,V,X,Y,new_eq]], [])]))
-            if(len(algebraic_equations) > 0):
-                base_field = R_UVW.base_ring()
-                if(len(algebraic_equations) > 1): # Case with multiple algebraic extensions
-                    dlogging.warning("WalkModel:GMI: more than one algebraic extension")
-                    i = 0
-                    for equation in algebraic_equations:
-                        new_name = name+("_%d" %i)
-                        poly = PolynomialRing(base_field, name)(equation.replace("_Z", name))
-                        F, roots, _ = self.alg_extension(poly, new_name); element = roots[0]
+        ## At this point we have strings with the result of the Maple computation.
+        ## Getting the algebraic elements
+        algebraic_equations = list(set([el.split(")")[0] for el in sum([line.split("RootOf(")[1:] for line in [U,V,X,Y,new_eq]], [])]))
+        if(len(algebraic_equations) > 0):
+            base_field = R_UVW.base_ring()
+            if(len(algebraic_equations) > 1): # Case with multiple algebraic extensions
+                dlogging.warning("WalkModel:GMI: more than one algebraic extension")
+                i = 0
+                for equation in algebraic_equations:
+                    new_name = name+("_%d" %i)
+                    poly = PolynomialRing(base_field, name)(equation.replace("_Z", name))
+                    F, roots, _ = self.alg_extension(poly, new_name); element = roots[0]
 
-                        U,V,X,Y,new_eq = [el.replace("RootOf(%s)" %equation, str(element)) for el in [U,V,X,Y,new_eq]]
+                    U,V,X,Y,new_eq = [el.replace("RootOf(%s)" %equation, str(element)) for el in [U,V,X,Y,new_eq]]
 
-                elif(len(algebraic_equations) == 1): # Case with only one algebraic extension
-                    poly = PolynomialRing(base_field, name)(algebraic_equations[0].replace("_Z", name))
-                    F, roots, _ = self.alg_extension(poly, name); element = roots[0]
-                    
-                    U,V,X,Y,new_eq = [el.replace("RootOf(%s)" %algebraic_equations[0], str(element)) for el in [U,V,X,Y,new_eq]]
+            elif(len(algebraic_equations) == 1): # Case with only one algebraic extension
+                poly = PolynomialRing(base_field, name)(algebraic_equations[0].replace("_Z", name))
+                F, roots, _ = self.alg_extension(poly, name); element = roots[0]
+                
+                U,V,X,Y,new_eq = [el.replace("RootOf(%s)" %algebraic_equations[0], str(element)) for el in [U,V,X,Y,new_eq]]
 
-                R_UVW = R_UVW.change_ring(F); F_UVW = FractionField(R_UVW)
-                u,v,w = [R_UVW(el) for el in [u,v,w]]
-                R_XYZ = R_XYZ.change_ring(F); F_XYZ = FractionField(R_XYZ)
-                x,y,z = [R_XYZ(el) for el in [x,y,z]]
-            else:
-                F = R_UVW.base_ring()
+            R_UVW = R_UVW.change_ring(F); F_UVW = FractionField(R_UVW)
+            u,v,w = [R_UVW(el) for el in [u,v,w]]
+            R_XYZ = R_XYZ.change_ring(F); F_XYZ = FractionField(R_XYZ)
+            x,y,z = [R_XYZ(el) for el in [x,y,z]]
+        else:
+            F = R_UVW.base_ring()
 
-            U = F_XYZ(U); V = F_XYZ(V); X = F_UVW(X); Y = F_UVW(Y); new_eq = R_UVW(new_eq)
+        U = F_XYZ(U); V = F_XYZ(V); X = F_UVW(X); Y = F_UVW(Y); new_eq = R_UVW(new_eq)
+        return U, V, X, Y, new_eq, F
 
-            ## Creating the corresponding maps
-            U = U(x=x/z,y=y/z); V = V(x=x/z, y=y/z)
-            try:
-                g_W = gcd(U.denominator(), V.denominator())
-                lcm_W = R_XYZ(U.denominator()*V.denominator()//g_W)
-                factor_U = R_XYZ(V.denominator()//g_W); factor_V = R_XYZ(U.denominator()//g_W)
-            except NotImplementedError:
-                lcm_W = U.denominator()*V.denominator()
-                factor_U = V.denominator(); factor_V = U.denominator()
+    # @dLogFunction("info")
+    # def __get_sage_info(self, namr='r'):
+    #     r'''
+    #         Method to get the Weierstrass normal form of the model
 
-            X = X(u=u/w,v=v/w); Y = Y(u=u/w, v=v/w)
-            try:
-                g_A = gcd(X.denominator(), Y.denominator())
-                lcm_A = R_UVW(X.denominator()*Y.denominator()//g_A)
-                factor_X = R_UVW(Y.denominator()//g_A); factor_Y = R_UVW(X.denominator()//g_A)
-            except NotImplementedError:
-                lcm_A = X.denominator()*Y.denominator()
-                factor_X = Y.denominator(); factor_Y = X.denominator()
-
-            UVW = tuple([R_XYZ(el) for el in (U.numerator()*factor_U, V.numerator()*factor_V, lcm_W)])
-            XYZ = tuple([R_UVW(el) for el in (X.numerator()*factor_X, Y.numerator()*factor_Y, lcm_A)])
-
-            new_eq = self.ring('W')(str(R_UVW(new_eq).homogenize(w)))
-            self.__kernel['W'] = self.ring('W')(str(new_eq))
-
-            ## Assigning the result to the variables of the Model
-
-            if(WalkModel._F != F): #self.change_ring(F)
-                ## Creating extended curves
-                self.__maps[('W','A')] = simpl_morphism(Hom(self.curve('W').change_ring(F), self.curve('A').change_ring(F))(XYZ))
-                self.__maps[('A','W')] = simpl_morphism(Hom(self.curve('A').change_ring(F), self.curve('W').change_ring(F))(UVW))
-                self.__maps[('A','P')] = self.map('A','P').change_ring(F)
-                self.__maps[('P','A')] = self.map('P','A').change_ring(F)
-            else:
-                self.__maps[('W','A')] = simpl_morphism(Hom(self.curve('W'), self.curve('A'))(XYZ))
-                self.__maps[('A','W')] = simpl_morphism(Hom(self.curve('A'), self.curve('W'))(UVW))
-
-            self.__maple[name] = (UVW,XYZ,new_eq)
-        return self.__maple[name]
-
-    @dLogFunction("info")
-    def __get_sage_info(self, namr='r'):
-        r'''
-            Method to get the Weierstrass normal form of the model
-
-            This method relies on methods from Sage to compute the normal form of the kernel equation of the model.
-            The results may be incomplete, resulting in further errors through the executions.
-        '''
-        raise NotImplementedError("The method __get_sage_info is not implemented")
+    #         This method relies on methods from Sage to compute the normal form of the kernel equation of the model.
+    #         The results may be incomplete, resulting in further errors through the executions.
+    #     '''
+    #     raise NotImplementedError("The method __get_sage_info is not implemented")
 
     @dLogFunction()
     def alg_extension(self, polynomial, n=None):
