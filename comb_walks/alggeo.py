@@ -221,26 +221,29 @@ def simpl_morphism(morphism):
               To:   Closed subscheme of Product of projective spaces P^1 x P^1 over Rational Field defined by:
               x1^2*y0 + x0^2*y1
               Defn: Defined on coordinates by sending (x : y : z) to
-                        (x^2 : z^2 , y^4 : z^4)
+                        (y : z , y^4 : z^4)
     '''
     codo_ambient = morphism.codomain().ambient_space()
     ring = morphism.domain().ambient_space().coordinate_ring()
-    polys = morphism.defining_polynomials()
+    new_polys = morphism.defining_polynomials()
+    polys = []
 
     ## Checking if the space is a product of projective spaces
     from sage.schemes.product_projective.space import is_ProductProjectiveSpaces as is_Product
-    if(is_Product(codo_ambient)):
-        new_polys = []
-        for component in codo_ambient.components():
-            new_polys += __simpl_polynomials_gcd_content(polys[len(new_polys):len(new_polys)+len(component.gens())])
 
-        new_polys = [ring(p) for p in new_polys]
-        try:
-            return morphism.parent()(new_polys)
-        except ValueError:
-            pass
+    while(polys != new_polys):
+        polys = new_polys
+        if(is_Product(codo_ambient)):
+            new_polys = []
+            for component in codo_ambient.components():
+                new_polys += __simpl_polynomials_gcd_content(polys[len(new_polys):len(new_polys)+len(component.gens())])
 
-    return morphism.parent()([ring(p) for p in __simpl_polynomials_gcd_content(polys)])
+            new_polys = [simplify_rational_variety(ring(p), morphism.domain()) for p in new_polys]
+        else:
+            new_polys = [simplify_rational_variety(ring(p), morphism.domain()) for p in __simpl_polynomials_gcd_content(polys)]
+
+
+    return morphism.parent()(new_polys)
 
 def __simpl_polynomials_gcd_content(*polys):
     if(len(polys) == 1 and (type(polys) in (list, tuple))):
