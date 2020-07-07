@@ -491,11 +491,11 @@ class WalkModel():
 
                 sage: from comb_walks.walkmodel import WalkModel; m = WalkModel.example_model()
                 sage: x,y,z = m.vars(1); u,v,w = m.vars(2); x0,x1,y0,y1 = m.vars(3); t = m.pars()
-                sage: all(m.ring(el) == FractionField(m.base_ring()[x,y,z]) for el in [1,'xyz','xy','a','A'])
+                sage: all(m.field(el) == FractionField(m.base_ring()[x,y,z]) for el in [1,'xyz','xy','a','A'])
                 True
-                sage: all(m.ring(el) == FractionField(m.base_ring()[u,v,w]) for el in [2, 'uvw', 'uv', 'w', 'weierstrass', 'W'])
+                sage: all(m.field(el) == FractionField(m.base_ring()[u,v,w]) for el in [2, 'uvw', 'uv', 'w', 'weierstrass', 'W'])
                 True
-                sage: all(m.ring(el) == FractionField(m.base_ring()[x0,x1,y0,y1]) for el in [3, 'x0x1y0y1', 'x0y0', 'p', 'projective', 'P'])
+                sage: all(m.field(el) == FractionField(m.base_ring()[x0,x1,y0,y1]) for el in [3, 'x0x1y0y1', 'x0y0', 'p', 'projective', 'P'])
                 True
 
             These relation between the :func:`base_ring` and the coordinate rings has to be preserved even
@@ -503,11 +503,11 @@ class WalkModel():
 
                 sage: nF = FractionField(NumberField(QQ['i']('i^2+1'), 'i')[t])
                 sage: m.change_ring(nF)
-                sage: all(m.ring(el) == FractionField(m.base_ring()[x,y,z]) for el in [1,'xyz','xy','a','A'])
+                sage: all(m.field(el) == FractionField(m.base_ring()[x,y,z]) for el in [1,'xyz','xy','a','A'])
                 True
-                sage: all(m.ring(el) == FractionField(m.base_ring()[u,v,w]) for el in [2, 'uvw', 'uv', 'w', 'weierstrass', 'W'])
+                sage: all(m.field(el) == FractionField(m.base_ring()[u,v,w]) for el in [2, 'uvw', 'uv', 'w', 'weierstrass', 'W'])
                 True
-                sage: all(m.ring(el) == FractionField(m.base_ring()[x0,x1,y0,y1]) for el in [3, 'x0x1y0y1', 'x0y0', 'p', 'projective', 'P'])
+                sage: all(m.field(el) == FractionField(m.base_ring()[x0,x1,y0,y1]) for el in [3, 'x0x1y0y1', 'x0y0', 'p', 'projective', 'P'])
                 True
         '''
         return self.ambient(model).coordinate_ring().fraction_field()
@@ -1002,8 +1002,8 @@ class WalkModel():
                 (-t)*x^2*y + (-t)*x*y^2 + x*y*z + (-t)*x*z^2 + (-t)*y*z^2
                 sage: m.kernel('P')
                 (-t)*x0*x1*y0^2 + (-t)*x0^2*y0*y1 + x0*x1*y0*y1 + (-t)*x1^2*y0*y1 + (-t)*x0*x1*y1^2
-                sage: m.kernel('W')
-                (-4)*u^3 + v^2*w + (4/3*t^4 - 4/3*t^2 + 1/12)*u*w^2 + (-8/27*t^6 - 5/9*t^4 + 1/9*t^2 - 1/216)*w^3
+                sage: set(m.kernel('W').monomials()) == set([w^3,u*w^2,u^3,v^2*w])
+                True
                 sage: all(m.kernel(inp) is m.kernel('A') for inp in [1,'xyz','xy','a','A'])
                 True
                 sage: all(m.kernel(inp) is m.kernel('P') for inp in [3, 'x0x1y0y1', 'x0y0', 'p', 'projective', 'P'])
@@ -1167,7 +1167,12 @@ class WalkModel():
             k = self.kernel(model)
             curve = self.curve(model)
 
-            factors = poly.factor(proof=False)
+            try:
+                factors = poly.factor(proof=False)
+            except TypeError as e: # Detecting error for having a 't' in the polynomial ring
+                if(e.args[0] != "no conversion of this ring to a Singular ring defined"):
+                    raise e
+                factors = (poly.parent().change_ring(self.__field_F)(str(poly))).factor(proof=False)
             result = []
             for factor in factors:
                 f = factor[0]
@@ -1190,7 +1195,12 @@ class WalkModel():
             k = self.kernel(model)
             curve = self.curve(model)
 
-            factors = poly.factor(proof=False)
+            try:
+                factors = poly.factor(proof=False)
+            except TypeError as e: # Detecting error for having a 't' in the polynomial ring
+                if(e.args[0] != "no conversion of this ring to a Singular ring defined"):
+                    raise e
+                factors = (poly.parent().change_ring(self.__field_F)(str(poly))).factor(proof=False)
             result = []
             for factor in factors:
                 f = factor[0]
@@ -1801,7 +1811,7 @@ class WalkModel():
         '''
         model = self.model(model)
 
-        if(not ((func,model) in self.__poles)):
+        if(not ((str(func),model) in self.__poles)):
             # Weiertrass case
             if(model == "W"):
                 poles = self.poles(pullback(self.map("P","W"))(func))
@@ -1821,9 +1831,9 @@ class WalkModel():
                 poles = [el for el in poles if asymptotics(self.curve('P'), func, el)[0] < 0]
 
             # Adding the new value
-            self.__poles[(func, model)] = poles
+            self.__poles[(str(func), model)] = poles
 
-        return self.__poles[(func, model)]
+        return self.__poles[(str(func), model)]
 
     @cached_method
     def only_pole_point(self, order, point, model="P"):
@@ -2380,7 +2390,7 @@ class WalkModel():
                 Scheme endomorphism of Closed subscheme of Product of projective spaces P^1 x P^1 ...
                 (-t)*x0*x1*y0^2 + (-t)*x1^2*y0^2 + x0*x1*y0*y1 + (-t)*x0^2*y1^2
                 Defn: Defined by sending (x0 : x1 , y0 : y1) to 
-                        (-x0^3*y1^2 : -x0^2*x1*y0^2 + (-2)*x0*x1^2*y0^2 - x1^3*y0^2 , -x0^2*y1 : -x0*x1*y0 - x1^2*y0).
+                        ((-t)*x0^2*y1 : -x0*x1*y0 - x1^2*y0 + t*x0^2*y1 + t*x0*x1*y1 , -x0^2*y1 : -x0*x1*y0 - x1^2*y0).
                 sage: NonEllipticC[0].tau('w')
                 Traceback (most recent call last):
                 ...
@@ -2426,7 +2436,7 @@ class WalkModel():
                 Scheme endomorphism of Closed subscheme of Product of projective spaces P^1 x P^1 ...
                 (-t)*x0*x1*y0^2 + (-t)*x1^2*y0^2 + x0*x1*y0*y1 + (-t)*x0^2*y1^2
                 Defn: Defined by sending (x0 : x1 , y0 : y1) to 
-                        (-x1*y0^2 : -x0*y1^2 , -x1^2*y0^3 : -x0*x1*y0^2*y1 - x0^2*y1^3).
+                        (-x1*y0^2 : -x0*y1^2 , (-t)*x1*y0^2 : t*x1*y0*y1 - x0*y1^2).
                 sage: NonEllipticC[0].itau('w')
                 Traceback (most recent call last):
                 ...
@@ -2493,7 +2503,7 @@ class WalkModel():
 
             EXAMPLES::
 
-                sage: comb_walks import * 
+                sage: from comb_walks import * 
                 sage: WalkModel.example_model().order_tau()
                 2
 
@@ -2890,11 +2900,13 @@ class WalkModel():
 
             If any error happend, a :class:`WeiertrassFormException` is raised
         '''
+        dlogging.log(25, "walkmodel:__gwf: computing Weierstrass form using Sage")
         x0,x1,y0,y1 = self.vars('P')
         x,y,_ = self.vars('A')
         u,v,_ = self.vars('W')
 
         ## Getting a point on the curve
+        dlogging.log(25, "walkmodel:__gwf: computing points on the curve")
         candidates = list(set(self.intersection(x0, 'P') + self.intersection(x1,'P') + self.intersection(y0, 'P') + self.intersection(y1,'P')))
 
         ## Sorting the candidates between rational and algebraic points
@@ -2915,28 +2927,33 @@ class WalkModel():
 
         if(P is None):
             raise WeierstrassFormError("No candidate is a finite point")
+
+        dlogging.log(25, "walkmodel:__gwf: chosen point on the curve: %s" %P)
                 
         F = P.scheme().base_ring()
-        
+        eval_dic = {'x0': x, 'x1': 1, 'y0': y, 'y1': 1}
+        back_dic = {'x': x0/x1, 'y': y0/y1}
+
+        ## Computing the function U        
         Udenom = (P[0][1]*x0 - P[0][0]*x1)*(P[1][1]*y0 - P[1][0]*y1)
         Q1 = apply_map(self.iota(1,'P'), P); Q2 = apply_map(self.iota(2,'P'), P)
         Unumer = (Q2[0][1]*x0 - Q2[0][0]*x1)*(Q1[1][1]*y0 - Q1[1][0]*y1)
         U = Unumer / Udenom
+        Uxy = U(**eval_dic); Kxy = self.kernel('A')(z=1)
 
+        dlogging.log(25, "walkmodel:__gwf: computed U(x,y): %s" %Uxy)
         ## U has only one pole at P of order -2
-        assert (self.poles(U, 'P') == [P] and asymptotics(self.curve('P'), U, P)[0] == -2), "The function U has different poles than expected"
+        #assert (self.poles(U, 'P') == [P] and asymptotics(self.curve('P'), U, P)[0] == -2), "The function U has different poles than expected"
 
         ## V can be computed as the derivative of U
-        eval_dic = {'x0': x, 'x1': 1, 'y0': y, 'y1': 1}
-        back_dic = {'x': x0/x1, 'y': y0/y1}
-            
-        Uxy = U(**eval_dic); Kxy = self.kernel('A')(z=1)
         V = simplify_rational_variety((Kxy.derivative(y)*Uxy.derivative(x) - Kxy.derivative(x)*Uxy.derivative(y))(**back_dic), self.curve('P'))
         Vxy = V(**eval_dic)
-        assert (self.poles(V, 'P') == [P] and asymptotics(self.curve('P'), V, P)[0] == -3), "The function V has different poles than expected"
+        dlogging.log(25, "walkmodel:__gwf: computed V(x,y): %s" %Vxy)
+        #assert (self.poles(V, 'P') == [P] and asymptotics(self.curve('P'), V, P)[0] == -3), "The function V has different poles than expected"
 
         ## Now we can compute the 7 functions that are linearly dependent
         ## 1, u, u^2, u^3, v, v*u, v^2
+        dlogging.log(25, "walkmodel:__gwf: computing the relation between U and V...")
         funcs = [1, U, U**2, U**3, V, V*U, V**2]
 
         ## And we can compute the relation using Linear Algebra
@@ -2944,20 +2961,23 @@ class WalkModel():
         system_lhs = vector([expand_at_point(self.curve('P'), funcs[-1], P, 1)[0].get(i,0) for i in range(-6,1)])
         coeffs = system_Matrix.solve_left(-system_lhs)
 
-        assert (simplify_rational_variety(sum([funcs[i]*coeffs[i] for i in range(len(funcs)-1)]) + funcs[-1], self.curve('P')) == 0), "The equation does not hold"
+        #assert (simplify_rational_variety(sum([funcs[i]*coeffs[i] for i in range(len(funcs)-1)]) + funcs[-1], self.curve('P')) == 0), "The equation does not hold"
 
         a,b,c,d,e,f = coeffs
+        dlogging.log(25, "walkmodel:__gwf: relation computed")
 
         if(f != 0):
             raise WeierstrassFormError("The coefficient u*v is not zero")
         u_shift = c/(3*d); v_shift = e/2
 
-
+        dlogging.log(25, "walkmodel:__gwf: computing the functions X(u,v) and Y(u,v)...")
         X, Y = [self.ring('w').fraction_field()(el.operands()[1])(u=u-u_shift,v=v-v_shift) for el in solve([SR(Uxy)-SR(u)==0,SR(Vxy)-SR(v)==0], [SR(x),SR(y)])[0]]
+        dlogging.log(22, "walkmodel:__gwf: functions X and Y computed.")
         Uxy += u_shift; Vxy += v_shift
-        ## Creating the new equation
         
+        ## Creating the new equation
         new_eq = v**2 + d*u**3 + ((-c**2/3 + b*d)/d)*u + ((-(d**2*e**2)/4 + (2*c**3)/27 - (b*c*d)/3 + a*d**2)/d**2)
+        dlogging.log(25, "walkmodel:__gwf: final Weierstrass equation: %s" %new_eq)
 
         return self.field('A')(Uxy), self.field('A')(Vxy), self.field('W')(X), self.field('W')(Y), self.ring('W')(new_eq), F
 
@@ -3254,9 +3274,9 @@ class WalkModel():
 
                 sage: from comb_walks import *
                 sage: WalkModel.example_model().name()
-                Example Model
-                sage: AllModels[0]
-                FG-BMM-1.01
+                'Example Model'
+                sage: AllModels[0].name()
+                'FG-BMM-1.01'
             
             It is important to remark that having different names does not imply that the models are different::
 
