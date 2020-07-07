@@ -266,8 +266,9 @@ def __simpl_polynomials_gcd_content(*polys):
     if(to_divide in base_ring): # gcd is trivial
         result = [el//to_divide for el in polys]
     else:
-        v = to_divide.variables()[-1]
-        result = [P(str(p.polynomial(v)//to_divide.polynomial(v))) for p in polys]
+        result = [P(str(p//to_divide)) for p in polys]
+        # v = to_divide.variables()[-1]
+        # result = [P(str(p.polynomial(v)//to_divide.polynomial(v))) for p in polys]
 
     if(any(not el.denominator() in base_ring for el in result)):
         raise Exception("Weird error: the final results are not polynomials")
@@ -664,11 +665,14 @@ def simplify_rational_variety(func, variety):
             sage: simplify_rational_variety((x^3-y*x^2+3*x*z^2)/(z^3), C)
             (x*y - y^2 + 3*x*z)/z^2
     '''
+    from sage.categories.pushout import pushout
     coor_ring = variety.coordinate_ring()
     if(not parent(func).is_field()): # just a polynomial
+        coor_ring = pushout(parent(func), coor_ring)
         n = coor_ring(func)
         d = coor_ring.one()
     else: # a rational function
+        coor_ring = pushout(parent(func.numerator()), coor_ring)
         n = coor_ring(func.numerator())
         d = coor_ring(func.denominator())
 
