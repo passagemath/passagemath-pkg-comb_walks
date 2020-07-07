@@ -30,7 +30,7 @@ r'''
 # Sage imports
 from sage.all import (ProjectiveSpace, QQ, ZZ, random, ceil, cached_method, parent,
     Hom, binomial, FractionField, vector, Matrix, Poset, DiGraph, Infinity,
-    PolynomialRing, gcd, Integer, randint, solve, SR)
+    PolynomialRing, gcd, Integer, randint, solve, SR, TermOrder, ideal)
 from sage.structure.coerce_exceptions import CoercionException
 
 # Local imports
@@ -2971,7 +2971,39 @@ class WalkModel():
         u_shift = c/(3*d); v_shift = e/2
 
         dlogging.log(25, "walkmodel:__gwf: computing the functions X(u,v) and Y(u,v)...")
-        X, Y = [self.ring('w').fraction_field()(el.operands()[1])(u=u-u_shift,v=v-v_shift) for el in solve([SR(Uxy)-SR(u)==0,SR(Vxy)-SR(v)==0], [SR(x),SR(y)])[0]]
+        X, Y = None, None
+
+        # We use groebner basis  with appropriate order for that
+        R = PolynomialRing(self.__F, ['x','y','u','v'], order=TermOrder('lex(2),lex(2)'))
+        equations = [R(str(Uxy.numerator())) - R('u')*R(str(Uxy.denominator())), 
+                    R(str(Vxy.numerator())) - R('v')*R(str(Vxy.denominator())), 
+                    R(str(self.kernel('A')(z=1)))]
+
+        valid = [el for el in ideal(equations).groebner_basis() if 
+                (el.degree(R('x')) == 0 and el.degree(R('y')) == 1) or (el.degree(R('x')) == 1 and el.degree(R('y')) == 0)]
+
+        if(len(valid) > 0):
+            first_eq = equations[0]
+            candidate = valid[0]
+            Rx = R('x'); Ry = R('y')
+            if(candidate.degree(Rx) > 0): # Case we can get X
+                candidate = candidate.polynomial(Rx); first_eq = first_eq.polynomial(Ry)
+                X = -R(candidate[0])/R(candidate[1])
+                Y = (-R(first_eq[0])/R(first_eq[1]))(x=X)
+            elif(candidate.degree(Ry) > 0): # Case we can get Y
+                candidate = candidate.polynomial(Ry); first_eq = first_eq.polynomial(Rx)
+                Y = -R(candidate[0])/R(candidate[1])
+                X = (-R(first_eq[0])/R(first_eq[1]))(y=Y)
+
+            X = self.field('W')(str(X))
+            Y = self.field('W')(str(Y))
+        ## Last resource: using solve
+        if(any(el is None for el in (X, Y))):
+            X, Y = [self.ring('w').fraction_field()(el.operands()[1]) for el in solve([SR(Uxy)-SR(u)==0,SR(Vxy)-SR(v)==0], [SR(x),SR(y)])[0]]
+
+        ## Computing the shifting
+        X = X(u=u-u_shift,v=v-v_shift); Y = Y(u=u-u_shift,v=v-v_shift)
+
         dlogging.log(22, "walkmodel:__gwf: functions X and Y computed.")
         Uxy += u_shift; Vxy += v_shift
         
