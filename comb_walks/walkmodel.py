@@ -3020,6 +3020,7 @@ class WalkModel():
         try:
             maple('x')
         except TypeError:
+            dlogging.warning("There is no Maple in the system. The computations will fall back to Sage implementation of the Weierstrass form (slower)")
             raise NoMapleError()
 
         ## Doing the usual computations
