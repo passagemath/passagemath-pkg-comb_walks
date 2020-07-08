@@ -2974,7 +2974,7 @@ class WalkModel():
         X, Y = None, None
 
         # We use groebner basis  with appropriate order for that
-        R = PolynomialRing(self.__F, ['x','y','u','v'], order=TermOrder('lex(2),lex(2)'))
+        R = PolynomialRing(self.__F, ['x','y','u','v'], order=TermOrder('degrevlex(2),degrevlex(2)'))
         equations = [R(str(Uxy.numerator())) - R('u')*R(str(Uxy.denominator())), 
                     R(str(Vxy.numerator())) - R('v')*R(str(Vxy.denominator())), 
                     R(str(self.kernel('A')(z=1)))]
