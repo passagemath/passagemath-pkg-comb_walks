@@ -649,6 +649,66 @@ class WalkModel():
             return final_point, all_steps
         return final_point
 
+    def walk_in_model(self, walk, restriction="none"):
+        r'''
+            Method that checks if a given walk is valid for the model and the restriction given.
+
+            This method takes a walk in the format outputted by :func:`random_walk` when steps is set
+            to ``True`` and checks if such walk is valid for this model and also checks the restriction.
+
+            INPUT:
+                * ``walk``: the walk to be plotted. This has the structure ``(ending_point, steps)`` where 
+                  ``steps`` is a list of tuples with at least two elements.
+                * ``restriction``: restriction of the walk. There are three possible choices:
+                    - ``"quarter"``: the walk will be in the first quadrant.
+                    - ``"half"``: the walk will be in the upper half plane.
+                    - anything else: the walk is free to move through the whole plane.
+
+            EXAMPLES::
+
+                sage: from comb_walks import *
+                sage: model = WalkModel(N,S,E)
+                sage: model.walk_in_model([(1,1), (N, S, S, E, N, N, N)])
+                True
+                sage: model.walk_in_model([(1,1), (N, S, S, W, N, N, N)])
+                False
+                sage: model.walk_in_model([(1,1), (N, S, S, E, N, N, N)], restriction="half")
+                False
+                sage: model.walk_in_model([(1,1), (N, S, S, E, N, N, N)], restriction="quarter")
+                False
+
+            The method also distinguishes the restrictions::
+
+                sage: model = WalkModel(N,S,E,W)
+                sage: model.walk_in_model([(1,3), (N,S,N,N,W,E,E,N)])
+                True
+                sage: model.walk_in_model([(1,3), (N,S,N,N,W,E,E,N)], restriction="half")
+                True
+                sage: model.walk_in_model([(1,3), (N,S,N,N,W,E,E,N)], restriction="quarter")
+                False
+        '''
+        ending, steps = walk
+        steps = list(steps); steps.reverse()
+
+        # Checking the steps are valid
+        if(not all(step in self.__steps for step in steps)):
+            return False
+
+        # Checking the restrictions
+        if(restriction in ("quarter", "half")):
+            if(restriction == "quarter"): condition = lambda p : (p[0] >= 0 and p[1] >= 0)
+            else: condition = lambda p : p[1] >= 0
+
+            if(not condition(ending)): return False
+
+            current = ending
+            for step in steps:
+                current = tuple(current[i] - step[i] for i in range(2))
+                if(not condition(current)): return False
+                
+        # The walk is valid
+        return True
+
     @cached_method
     def weight_matrix(self):
         r'''
@@ -3252,18 +3312,16 @@ class WalkModel():
         picture.set_aspect_ratio(1)
         return picture
 
-    def plot_walk(self, size, start=(0,0), restriction="quarter", **kwds):
-        '''
-            This method depicts a random walk valid for this model.
+    def plot_walk(self, walk, **kwds):
+        r'''
+            Plot method for a specific walk.
 
-            This method creates a random walk valid for the model (see method :func:`random_walk`). The picture
-            prints with arrows all the middle steps and make a transition in colors from the beginning of the
-            walk until the end.
+            This method does not depend on the model, however it is useful for simplicity of implementation.
+            The arguments of ``kwds`` are related to how the arrows in the walk will be drawn.
 
-            INPUT::
-                * ``size``: number of steps of the random walk.
-                * ``start``: starting point for the generated random walk.
-                * ``restriction``: restriction for the random walk (see :func:`random_walk`)
+            INPUT:
+                * ``walk``: the walk to be plotted. This has the structure ``(ending_point, steps)`` where 
+                  ``steps`` is a list of tuples with at least two elements.
                 * ``kwds``: this method allows extra parameters:
                     * ``init_color``: a valid input for ``rgbcolor``. This will be the color from the beginning of the walk.
                       This value is set to ``"blue"`` by default.
@@ -3273,7 +3331,11 @@ class WalkModel():
         '''
         from sage.plot.arrow import arrow
         from sage.plot.colors import rgbcolor
-        _,steps = self.random_walk(size, start, True, restriction)
+
+        ending, steps = walk
+        size = len(steps)
+        # Computing the starting point
+        start = [ending[i] - sum(step[i] for step in steps) for i in [0,1]]
 
         ## Defining the colors for the arrows
         init_color = rgbcolor(kwds.pop('init_color') if 'init_color' in kwds else "blue", 'rgb')
@@ -3282,7 +3344,8 @@ class WalkModel():
             pos = float(it)/(size-1)
             return rgbcolor(tuple((1-pos)*init_color[i] + pos*end_color[i] for i in range(3)), 'rgb')
 
-        result = arrow(start, steps[0],color=init_color,**kwds); current = tuple(start[j]+steps[0][j] for j in range(2))
+        current = tuple(start[j]+steps[0][j] for j in range(2))
+        result = arrow(start, current,color=init_color,**kwds) 
 
         ## Building the arrows
         for i in range(1,len(steps)):
@@ -3295,6 +3358,31 @@ class WalkModel():
 
         ## Return
         return result
+
+    def plot_random_walk(self, size, start=(0,0), restriction="quarter", **kwds):
+        r'''
+            This method depicts a random walk valid for this model.
+
+            This method creates a random walk valid for the model (see method :func:`random_walk`). The picture
+            prints with arrows all the middle steps and make a transition in colors from the beginning of the
+            walk until the end.
+
+            This method is equivalent to:
+            
+            ``self.plot_walk(self.random_walk(size,start,steps=True,restriction), **kwds)``
+
+            INPUT:
+                * ``size``: number of steps of the random walk.
+                * ``start``: starting point for the generated random walk.
+                * ``restriction``: restriction for the random walk (see :func:`random_walk`)
+                * ``kwds``: this method allows extra parameters:
+                    * ``init_color``: a valid input for ``rgbcolor``. This will be the color from the beginning of the walk.
+                      This value is set to ``"blue"`` by default.
+                    * ``end_color``: a valid input for ``rgbcolor``. This will be the color from the beginning of the walk.
+                      This value is set to ``"red"`` by default.
+                    * Other options will be directly passed to the constructor of arrows in ``sage.plot``
+        '''
+        return self.plot_walk(self.random_walk(size, start, True, restriction), **kwds)
 
     def name(self):
         r'''
