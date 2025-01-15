@@ -28,8 +28,17 @@ r'''
 #                  https://www.gnu.org/licenses/
 # ****************************************************************************
 
-from sage.all import (FractionField, Hom, parent, gcd, prod, lcm, Infinity,
-    reduce, PolynomialRing, cached_function)
+from functools import reduce
+
+from sage.arith.functions import lcm
+from sage.arith.misc import GCD as gcd
+from sage.categories.homset import Hom
+from sage.misc.cachefunc import cached_function
+from sage.misc.misc_c import prod
+from sage.rings.fraction_field import FractionField
+from sage.rings.infinity import Infinity
+from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+from sage.structure.element import parent
 
 import deprecation
 from datetime import datetime
