@@ -46,5 +46,14 @@ setup(
     cmdclass = {'test': SageTest}, # adding a special setup command for tests
     setup_requires   = [],
     install_requires = ['deprecation','sphinx'],
+    extras_require = {
+        'passagemath': [
+            'passagemath-graphs',
+            'passagemath-modules',
+            'passagemath-repl',
+            'passagemath-singular',
+            'passagemath-symbolics',
+        ],
+    },
 )
     

@@ -21,7 +21,9 @@ r'''
 #                  https://www.gnu.org/licenses/
 # ****************************************************************************
 
-from sage.all import (latex, var, Infinity)
+from sage.misc.latex import latex
+from sage.calculus.var import var
+from sage.rings.infinity import Infinity
 
 from .alggeo import (is_prod_point, order_morphism, asymptotics, pullback)
 from .walkmodel import (FiniteGroup, NonEllipticC, EllipticC, AllModels,

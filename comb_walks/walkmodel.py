@@ -28,9 +28,29 @@ r'''
 # ****************************************************************************
 
 # Sage imports
-from sage.all import (ProjectiveSpace, QQ, ZZ, random, ceil, cached_method, parent,
-    Hom, binomial, FractionField, vector, Matrix, Poset, DiGraph, Infinity,
-    PolynomialRing, gcd, Integer, randint, solve, SR, TermOrder, ideal)
+from sage.schemes.projective.projective_space import ProjectiveSpace
+from sage.rings.rational_field import Q as QQ
+from sage.rings.integer_ring import Z as ZZ
+from sage.misc.prandom import random
+from sage.functions.other import ceil
+from sage.misc.cachefunc import cached_method
+from sage.structure.element import parent
+from sage.categories.homset import Hom
+from sage.functions.other import binomial
+from sage.rings.fraction_field import FractionField
+from sage.modules.free_module_element import free_module_element as vector
+from sage.matrix.constructor import Matrix
+from sage.combinat.posets.posets import Poset
+from sage.graphs.digraph import DiGraph
+from sage.rings.infinity import Infinity
+from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+from sage.arith.misc import GCD as gcd
+from sage.rings.integer import Integer
+from sage.misc.prandom import randint
+from sage.symbolic.relation import solve
+from sage.symbolic.ring import SR
+from sage.rings.polynomial.term_order import TermOrder
+from sage.rings.ideal import Ideal as ideal
 from sage.structure.coerce_exceptions import CoercionException
 
 # Local imports
@@ -2658,7 +2678,8 @@ class WalkModel():
                 ...
                 NonEllipticError: the model Walk Model (NE-DHRS-1) is not elliptic
         '''
-        from sage.all import solve, var
+        from sage.symbolic.relation import solve
+        from sage.calculus.var import var
 
         if(not self.is_elliptic()):
             raise NonEllipticError("the model %s is not elliptic" %self)
